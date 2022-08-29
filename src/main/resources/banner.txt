@@ -1,0 +1,10 @@
+
+  ${AnsiColor.GREEN}███╗   ███╗  █████╗  ██╗  ██╗ ███████╗    ${AnsiColor.CYAN}  ███████╗ ███████╗ ███╗   ██╗ ███████╗ ███████╗
+  ${AnsiColor.GREEN}████╗ ████║ ██╔══██╗ ██║ ██╔╝ ██╔════╝    ${AnsiColor.CYAN}  ██╔════╝ ██╔════╝ ████╗  ██║ ██╔════╝ ██╔════╝
+  ${AnsiColor.GREEN}██╔████╔██║ ███████║ █████╔╝  █████╗ █████╗${AnsiColor.CYAN} ███████╗ █████╗   ██╔██╗ ██║ ███████╗ █████╗
+  ${AnsiColor.GREEN}██║╚██╔╝██║ ██╔══██║ ██╔═██╗  ██╔══╝ ╚════╝${AnsiColor.CYAN} ╚════██║ ██╔══╝   ██║╚██╗██║ ╚════██║ ██╔══╝
+  ${AnsiColor.GREEN}██║ ╚═╝ ██║ ██║  ██║ ██║  ██╗ ███████╗    ${AnsiColor.CYAN}  ███████║ ███████╗ ██║ ╚████║ ███████║ ███████╗
+  ${AnsiColor.GREEN}╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚══════╝    ${AnsiColor.CYAN}  ╚══════╝ ╚══════╝ ╚═╝  ╚═══╝ ╚══════╝ ╚══════╝
+
+${AnsiColor.BRIGHT_BLUE}:: Bobur Azimov 🤓  :: Running Spring Boot ${spring-boot.version} ::
+:: https://springhow.com/spring-boot-banner-generator/ ::${AnsiColor.BRIGHT_GREEN} ANSI Shadow ::
