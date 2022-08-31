@@ -18,8 +18,11 @@ public class SignupRequest {
 
     private Set<String> role;
 
-    @NotBlank
-    @Size(min = 6, max = 40)
+    public static final int PASSWORD_MIN_LENGTH = 4;
+
+    public static final int PASSWORD_MAX_LENGTH = 60;
+
+    @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
     private String password;
 
     public String getUsername() {

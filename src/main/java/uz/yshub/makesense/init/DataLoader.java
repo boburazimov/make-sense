@@ -5,16 +5,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import uz.yshub.makesense.controller.AuthController;
-import uz.yshub.makesense.model.Role;
-import uz.yshub.makesense.model.User;
-import uz.yshub.makesense.model.enums.ERole;
-import uz.yshub.makesense.payload.SignupRequest;
+import uz.yshub.makesense.domain.Role;
+import uz.yshub.makesense.domain.User;
+import uz.yshub.makesense.domain.enumeration.ERole;
 import uz.yshub.makesense.repository.RoleRepository;
 import uz.yshub.makesense.repository.UserRepository;
 
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 @Component

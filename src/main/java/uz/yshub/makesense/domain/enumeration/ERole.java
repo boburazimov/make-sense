@@ -1,4 +1,4 @@
-package uz.yshub.makesense.model.enums;
+package uz.yshub.makesense.domain.enumeration;
 
 public enum ERole {
 

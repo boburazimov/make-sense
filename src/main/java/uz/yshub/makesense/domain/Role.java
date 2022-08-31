@@ -1,15 +1,20 @@
-package uz.yshub.makesense.model;
+package uz.yshub.makesense.domain;
 
-import uz.yshub.makesense.model.enums.ERole;
+import uz.yshub.makesense.domain.enumeration.ERole;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "roles")
-public class Role {
+public class Role implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Integer id;
 
     @Enumerated(EnumType.STRING)
