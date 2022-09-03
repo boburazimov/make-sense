@@ -1,9 +1,12 @@
 package uz.yshub.makesense.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -146,8 +149,10 @@ public class ImageResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of images in body.
      */
+//    @Operation(summary = "List of Images", description = "Get all images", security = @SecurityRequirement(name = "bearerAuth"))
+//    @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/images")
-    public ResponseEntity<List<ImageDTO>> getAllImages(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<ImageDTO>> getAllImages(@ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Images");
         Page<ImageDTO> page = imageService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);

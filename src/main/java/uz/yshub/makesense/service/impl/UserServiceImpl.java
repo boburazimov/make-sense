@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         log.debug("Sign-in Information for User: {}", userDetails);
-        return new MessageResponse(jwt, true, roles);
+        return new MessageResponse(true, jwt, roles);
     }
 
     @Override

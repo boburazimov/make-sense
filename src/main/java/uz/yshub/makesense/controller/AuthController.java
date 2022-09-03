@@ -15,6 +15,7 @@ import uz.yshub.makesense.payload.SignupRequest;
 import uz.yshub.makesense.repository.UserRepository;
 import uz.yshub.makesense.security.jwt.JwtUtils;
 import uz.yshub.makesense.service.UserService;
+import uz.yshub.makesense.service.dto.UserDTO;
 
 import javax.security.auth.login.AccountException;
 import javax.validation.Valid;
@@ -32,7 +33,6 @@ public class AuthController {
     private final UserService userService;
 
     private static class AccountResourceException extends RuntimeException {
-
         private AccountResourceException(String message) {
             super(message);
         }
@@ -68,14 +68,14 @@ public class AuthController {
         log.debug("REST request to register new User : {}", signUpRequest);
 
         if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!", false));
+            return ResponseEntity.badRequest().body(new MessageResponse(false, "Error: Username is already taken!"));
         }
         if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!", false));
+            return ResponseEntity.badRequest().body(new MessageResponse(false, "Error: Email is already in use!"));
         }
 
         User newUser = userService.createUser(signUpRequest);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!", true, newUser));
+        return ResponseEntity.ok(new MessageResponse(true, "User registered successfully!", newUser));
     }
 
 //    @PostMapping("/account")
@@ -83,23 +83,19 @@ public class AuthController {
 //
 //    }
 
-
-
-
-
     /**
      * {@code GET  /auth/account} : get the current user.
-     *
+     * <p>
      * @return the current user.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
-//    @GetMapping("/account")
-//    public UserDTO getAccount() throws AccountException {
-//        return userService
-//                .getUserWithAuthorities()
-//                .map(UserDTO::new)
-//                .orElseThrow(() -> new AccountException("User could not be found"));
-//    }
+    @GetMapping("/account")
+    public UserDTO getAccount() throws AccountException {
+        return userService
+                .getUserWithAuthorities()
+                .map(UserDTO::new)
+                .orElseThrow(() -> new AccountResourceException("User could not be found"));
+    }
 
     /**
      * {@code POST /auth/signout} : Log out User.
@@ -110,6 +106,6 @@ public class AuthController {
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new MessageResponse("You've been signed out!", true));
+                .body(new MessageResponse(true, "You've been signed out!"));
     }
 }

@@ -13,10 +13,13 @@ import uz.yshub.makesense.security.UserDetailsImpl;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.Date;
 
 @Component
-public class JwtUtils {
+public class JwtUtils implements Serializable {
+
+    private static final long serialVersionUID = -7858869558953243875L;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 

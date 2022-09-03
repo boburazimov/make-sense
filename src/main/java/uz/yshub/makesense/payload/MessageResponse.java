@@ -11,11 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MessageResponse {
 
-    private String message;
     private boolean success;
+    private String message;
     private Object object;
 
-    public MessageResponse(String message, boolean success) {
+    public MessageResponse(boolean success, String message) {
         this.message = message;
         this.success = success;
     }
