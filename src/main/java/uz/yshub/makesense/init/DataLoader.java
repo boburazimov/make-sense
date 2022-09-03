@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import uz.yshub.makesense.controller.AuthController;
+import uz.yshub.makesense.controller.AuthResource;
 import uz.yshub.makesense.domain.Role;
 import uz.yshub.makesense.domain.User;
 import uz.yshub.makesense.domain.enumeration.ERole;
@@ -24,7 +24,7 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
-    AuthController authController;
+    AuthResource authResource;
 
     @Override
     public void run(String... args) throws Exception {

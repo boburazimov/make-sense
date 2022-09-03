@@ -1,5 +1,7 @@
 package uz.yshub.makesense.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +26,10 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+@Tag(name = "Account", description = "The Account API.")
+public class AuthResource {
 
-    private final Logger log = LoggerFactory.getLogger(AuthController.class);
+    private final Logger log = LoggerFactory.getLogger(AuthResource.class);
 
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;

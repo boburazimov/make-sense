@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/test")
 @SecurityRequirement(name = "bearerAuth")
-public class TestController {
+public class TestResource {
 
     @GetMapping("/all")
     public String allAccess() {

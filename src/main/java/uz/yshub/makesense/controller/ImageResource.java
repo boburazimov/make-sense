@@ -37,7 +37,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Image Resource", description = "The Image API. Contains all the operations that can be performed on a image.")
+@Tag(name = "Image", description = "The Image API. Contains all the operations that can be performed on a image.")
 public class ImageResource {
 
     private final Logger log = LoggerFactory.getLogger(ImageResource.class);
