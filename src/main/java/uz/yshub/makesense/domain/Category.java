@@ -2,6 +2,7 @@ package uz.yshub.makesense.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import uz.yshub.makesense.service.dto.CategoryDTO;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -53,6 +54,11 @@ public class Category implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Category(CategoryDTO categoryDTO) {
+        this.id = categoryDTO.getId();
+        this.name = categoryDTO.getName();
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

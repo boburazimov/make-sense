@@ -1,5 +1,7 @@
 package uz.yshub.makesense.service.dto;
 
+import uz.yshub.makesense.domain.Category;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -28,6 +30,11 @@ public class CategoryDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public CategoryDTO(Category category) {
+        this.id = category.getId();
+        this.name = category.getName();
     }
 
     @Override

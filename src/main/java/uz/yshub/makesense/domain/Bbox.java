@@ -2,6 +2,7 @@ package uz.yshub.makesense.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import uz.yshub.makesense.service.dto.BboxDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,6 +34,10 @@ public class Bbox implements Serializable {
 
     @Column(name = "bbox_heght")
     private Double bboxHeght;
+
+    public Bbox() {
+
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -99,6 +104,14 @@ public class Bbox implements Serializable {
 
     public void setBboxHeght(Double bboxHeght) {
         this.bboxHeght = bboxHeght;
+    }
+
+    public Bbox(BboxDTO bboxDTO) {
+        this.id = bboxDTO.getId();
+        this.bboxX = bboxDTO.getBboxX();
+        this.bboxY = bboxDTO.getBboxY();
+        this.bboxWidth = bboxDTO.getBboxWidth();
+        this.bboxHeght = bboxDTO.getBboxHeght();
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -1,5 +1,7 @@
 package uz.yshub.makesense.service.dto;
 
+import uz.yshub.makesense.domain.Annotation;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -75,6 +77,16 @@ public class AnnotationDTO implements Serializable {
     }
 
     public void setCategory(CategoryDTO category) {
+        this.category = category;
+    }
+
+    public AnnotationDTO(Annotation annotation, BboxDTO bbox, ProjectDTO project, ImageDTO image, CategoryDTO category) {
+        this.id = annotation.getId();
+        this.iscrowd = annotation.getIscrowd();
+        this.area = annotation.getArea();
+        this.bbox = bbox;
+        this.project = project;
+        this.image = image;
         this.category = category;
     }
 

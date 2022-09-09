@@ -1,6 +1,5 @@
 package uz.yshub.makesense.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.yshub.makesense.domain.User;
 import uz.yshub.makesense.payload.LoginRequest;
-import uz.yshub.makesense.payload.MessageResponse;
+import uz.yshub.makesense.payload.ApiResponse;
 import uz.yshub.makesense.payload.SignupRequest;
 import uz.yshub.makesense.repository.UserRepository;
 import uz.yshub.makesense.security.jwt.JwtUtils;
@@ -51,8 +50,8 @@ public class AuthResource {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         log.debug("REST request to Sign-in Account");
 
-        MessageResponse messageResponse = userService.signin(loginRequest);
-        return ResponseEntity.ok(messageResponse);
+        ApiResponse apiResponse = userService.signin(loginRequest);
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
@@ -71,14 +70,14 @@ public class AuthResource {
         log.debug("REST request to register new User : {}", signUpRequest);
 
         if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse(false, "Error: Username is already taken!"));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Error: Username is already taken!"));
         }
         if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse(false, "Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Error: Email is already in use!"));
         }
 
         User newUser = userService.createUser(signUpRequest);
-        return ResponseEntity.ok(new MessageResponse(true, "User registered successfully!", newUser));
+        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully!", newUser));
     }
 
 //    @PostMapping("/account")
@@ -109,6 +108,6 @@ public class AuthResource {
     public ResponseEntity<?> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new MessageResponse(true, "You've been signed out!"));
+                .body(new ApiResponse(true, "You've been signed out!"));
     }
 }

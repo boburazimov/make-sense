@@ -3,6 +3,7 @@ package uz.yshub.makesense.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import uz.yshub.makesense.service.dto.SegmentationDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -72,6 +73,13 @@ public class Segmentation implements Serializable {
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+
+    public Segmentation(SegmentationDTO segmentationDTO, Annotation annotation) {
+        this.id = segmentationDTO.getId();
+        this.coordinate = segmentationDTO.getCoordinate();
+        this.annotation = annotation;
+    }
 
     @Override
     public boolean equals(Object o) {

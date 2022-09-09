@@ -1,5 +1,7 @@
 package uz.yshub.makesense.service.dto;
 
+import uz.yshub.makesense.domain.Bbox;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -56,6 +58,14 @@ public class BboxDTO implements Serializable {
 
     public void setBboxHeght(Double bboxHeght) {
         this.bboxHeght = bboxHeght;
+    }
+
+    public BboxDTO(Bbox bbox) {
+        this.id = bbox.getId();
+        this.bboxX = bbox.getBboxX();
+        this.bboxY = bbox.getBboxY();
+        this.bboxWidth = bbox.getBboxWidth();
+        this.bboxHeght = bbox.getBboxHeght();
     }
 
     @Override

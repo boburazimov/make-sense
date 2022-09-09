@@ -1,5 +1,6 @@
 package uz.yshub.makesense.service.dto;
 
+import uz.yshub.makesense.domain.Project;
 import uz.yshub.makesense.domain.enumeration.ProjectTypeEnum;
 
 import javax.validation.constraints.NotNull;
@@ -40,6 +41,12 @@ public class ProjectDTO implements Serializable {
 
     public void setType(ProjectTypeEnum type) {
         this.type = type;
+    }
+
+    public ProjectDTO(Project project) {
+        this.id = project.getId();
+        this.description = project.getDescription();
+        this.type = project.getType();
     }
 
     @Override

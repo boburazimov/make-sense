@@ -9,18 +9,18 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageResponse {
+public class ApiResponse {
 
     private boolean success;
     private String message;
     private Object object;
 
-    public MessageResponse(boolean success, String message) {
+    public ApiResponse(boolean success, String message) {
         this.message = message;
         this.success = success;
     }
 
-    public MessageResponse(boolean success, Object object) {
+    public ApiResponse(boolean success, Object object) {
         this.success = success;
         this.object = object;
     }

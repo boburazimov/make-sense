@@ -2,6 +2,7 @@ package uz.yshub.makesense.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import uz.yshub.makesense.service.dto.ImageDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,6 +35,9 @@ public class Image extends AbstractAuditingEntity implements Serializable {
     @Column(name = "content_type")
     private String contentType;
 
+    @Column(name = "suffix")
+    private String suffix;
+
     @Column(name = "file_size")
     private String fileSize;
 
@@ -42,6 +46,10 @@ public class Image extends AbstractAuditingEntity implements Serializable {
 
     @Column(name = "height")
     private Integer height;
+
+    public Image() {
+
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -110,6 +118,14 @@ public class Image extends AbstractAuditingEntity implements Serializable {
         this.contentType = contentType;
     }
 
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
     public String getFileSize() {
         return this.fileSize;
     }
@@ -149,6 +165,18 @@ public class Image extends AbstractAuditingEntity implements Serializable {
         this.height = height;
     }
 
+    public Image(ImageDTO imageDTO) {
+        this.id = imageDTO.getId();
+        this.path = imageDTO.getPath();
+        this.originalFileName = imageDTO.getOriginalFileName();
+        this.fileName = imageDTO.getFileName();
+        this.contentType = imageDTO.getContentType();
+        this.suffix = imageDTO.getSuffix();
+        this.fileSize = imageDTO.getFileSize();
+        this.width = imageDTO.getWidth();
+        this.height = imageDTO.getHeight();
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -177,6 +205,7 @@ public class Image extends AbstractAuditingEntity implements Serializable {
             ", originalFileName='" + getOriginalFileName() + "'" +
             ", fileName='" + getFileName() + "'" +
             ", contentType='" + getContentType() + "'" +
+            ", suffix='" + getSuffix() + "'" +
             ", fileSize='" + getFileSize() + "'" +
             ", width=" + getWidth() +
             ", height=" + getHeight() +

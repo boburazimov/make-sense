@@ -3,7 +3,7 @@ package uz.yshub.makesense.service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.yshub.makesense.domain.User;
 import uz.yshub.makesense.payload.LoginRequest;
-import uz.yshub.makesense.payload.MessageResponse;
+import uz.yshub.makesense.payload.ApiResponse;
 import uz.yshub.makesense.payload.SignupRequest;
 
 import java.util.Optional;
@@ -23,7 +23,7 @@ public interface UserService {
      * @param loginRequest the HTTP request.
      * @return the login if the user is authenticated.
      */
-    MessageResponse signin(LoginRequest loginRequest);
+    ApiResponse signin(LoginRequest loginRequest);
 
     /**
      * Get current user with user-roles.

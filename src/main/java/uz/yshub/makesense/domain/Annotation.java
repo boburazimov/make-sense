@@ -2,6 +2,7 @@ package uz.yshub.makesense.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import uz.yshub.makesense.service.dto.AnnotationDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -40,6 +41,10 @@ public class Annotation implements Serializable {
 
     @ManyToOne
     private Category category;
+
+    public Annotation() {
+
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -135,6 +140,16 @@ public class Annotation implements Serializable {
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    public Annotation(AnnotationDTO annotationDTO, Bbox bbox, Project project, Image image, Category category) {
+        this.id = annotationDTO.getId();
+        this.iscrowd = annotationDTO.getIscrowd();
+        this.area = annotationDTO.getArea();
+        this.bbox = bbox;
+        this.project = project;
+        this.image = image;
+        this.category = category;
+    }
 
     @Override
     public boolean equals(Object o) {

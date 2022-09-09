@@ -1,39 +1,29 @@
 package uz.yshub.makesense.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.api.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-//import tech.jhipster.web.util.HeaderUtil;
-//import tech.jhipster.web.util.PaginationUtil;
-//import tech.jhipster.web.util.ResponseUtil;
+import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.controller.errors.BadRequestAlertException;
-import uz.yshub.makesense.controller.utils.PaginationUtil;
-import uz.yshub.makesense.controller.utils.ResponseUtil;
 import uz.yshub.makesense.repository.ImageRepository;
 import uz.yshub.makesense.service.ImageService;
+import uz.yshub.makesense.service.dto.ApiResponseDTO;
 import uz.yshub.makesense.service.dto.ImageDTO;
 
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * REST controller for managing {@link uz.yshub.makesense.domain.Image}.
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "bearerAuth")
@@ -42,105 +32,31 @@ public class ImageResource {
 
     private final Logger log = LoggerFactory.getLogger(ImageResource.class);
 
-    private static final String ENTITY_NAME = "image";
-
     private final ImageService imageService;
-
     private final ImageRepository imageRepository;
 
-    public ImageResource(ImageService imageService, ImageRepository imageRepository) {
-        this.imageService = imageService;
-        this.imageRepository = imageRepository;
-    }
-
     /**
-     * {@code POST  /images} : Create a new image.
+     * {@code POST  /images} : Upload images.
      *
-     * @param imageDTO the imageDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new imageDTO, or with status {@code 400 (Bad Request)} if the image has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @param files the array of images.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new imageDTO.
+     * @throws BadRequestAlertException if the files array are empty (Null).
      */
-    @PostMapping("/images")
-    public ResponseEntity<ImageDTO> createImage(@RequestBody ImageDTO imageDTO) throws URISyntaxException {
-        log.debug("REST request to save Image : {}", imageDTO);
-        if (imageDTO.getId() != null) {
-            throw new BadRequestAlertException("A new image cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        ImageDTO result = imageService.save(imageDTO);
-        return ResponseEntity
-            .created(new URI("/api/images/" + result.getId()))
-//            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
-    }
+    @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseDTO> uploadFiles(@RequestPart(value = "files") MultipartFile[] files, @RequestParam("bucket") String bucket) {
+        log.debug("REST request to upload an images");
 
-    /**
-     * {@code PUT  /images/:id} : Updates an existing image.
-     *
-     * @param id the id of the imageDTO to save.
-     * @param imageDTO the imageDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated imageDTO,
-     * or with status {@code 400 (Bad Request)} if the imageDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the imageDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PutMapping("/images/{id}")
-    public ResponseEntity<ImageDTO> updateImage(
-        @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody ImageDTO imageDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to update Image : {}, {}", id, imageDTO);
-        if (imageDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, imageDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        if (files == null && files.length > 0) {
+            throw new BadRequestAlertException("File must not be null!", "imageManagement", "fileNullPointer");
         }
 
-        if (!imageRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        try {
+            List<ImageDTO> images = imageService.uploadImages(files);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDTO(true, "Uploaded the images successfully", images));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ApiResponseDTO(false, e.getMessage()));
         }
-
-        ImageDTO result = imageService.update(imageDTO);
-        return ResponseEntity
-            .ok()
-//            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, imageDTO.getId().toString()))
-            .body(result);
-    }
-
-    /**
-     * {@code PATCH  /images/:id} : Partial updates given fields of an existing image, field will ignore if it is null
-     *
-     * @param id the id of the imageDTO to save.
-     * @param imageDTO the imageDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated imageDTO,
-     * or with status {@code 400 (Bad Request)} if the imageDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the imageDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the imageDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/images/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ImageDTO> partialUpdateImage(
-        @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody ImageDTO imageDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to partial update Image partially : {}, {}", id, imageDTO);
-        if (imageDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, imageDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!imageRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<ImageDTO> result = imageService.partialUpdate(imageDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-            result
-//            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, imageDTO.getId().toString())
-        );
     }
 
     /**
@@ -149,14 +65,13 @@ public class ImageResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of images in body.
      */
-//    @Operation(summary = "List of Images", description = "Get all images", security = @SecurityRequirement(name = "bearerAuth"))
-//    @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/images")
     public ResponseEntity<List<ImageDTO>> getAllImages(@ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Images");
-        Page<ImageDTO> page = imageService.findAll(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+//        Page<ImageDTO> page = imageService.findAll(pageable);
+//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+//        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        return null;
     }
 
     /**
@@ -165,12 +80,12 @@ public class ImageResource {
      * @param id the id of the imageDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the imageDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/images/{id}")
-    public ResponseEntity<ImageDTO> getImage(@PathVariable Long id) {
-        log.debug("REST request to get Image : {}", id);
-        Optional<ImageDTO> imageDTO = imageService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(imageDTO);
-    }
+//    @GetMapping("/images/{id}")
+//    public ResponseEntity<ImageDTO> getImage(@PathVariable Long id) {
+//        log.debug("REST request to get Image : {}", id);
+//        Optional<ImageDTO> imageDTO = imageService.findOne(id);
+//        return ResponseUtil.wrapOrNotFound(imageDTO);
+//    }
 
     /**
      * {@code DELETE  /images/:id} : delete the "id" image.
@@ -178,13 +93,12 @@ public class ImageResource {
      * @param id the id of the imageDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/images/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
-        log.debug("REST request to delete Image : {}", id);
-        imageService.delete(id);
-        return ResponseEntity
-            .noContent()
-//            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
-    }
+//    @DeleteMapping("/images/{id}")
+//    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
+//        log.debug("REST request to delete Image : {}", id);
+//        imageService.delete(id);
+//        return ResponseEntity
+//                .noContent()
+//                .build();
+//    }
 }

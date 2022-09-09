@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uz.yshub.makesense.domain.Role;
 import uz.yshub.makesense.domain.User;
 import uz.yshub.makesense.payload.LoginRequest;
-import uz.yshub.makesense.payload.MessageResponse;
+import uz.yshub.makesense.payload.ApiResponse;
 import uz.yshub.makesense.payload.SignupRequest;
 import uz.yshub.makesense.repository.RoleRepository;
 import uz.yshub.makesense.repository.UserRepository;
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public MessageResponse signin(LoginRequest loginRequest) {
+    public ApiResponse signin(LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         log.debug("Sign-in Information for User: {}", userDetails);
-        return new MessageResponse(true, jwt, roles);
+        return new ApiResponse(true, jwt, roles);
     }
 
     @Override

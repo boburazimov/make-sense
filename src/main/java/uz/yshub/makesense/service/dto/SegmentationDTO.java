@@ -1,5 +1,7 @@
 package uz.yshub.makesense.service.dto;
 
+import uz.yshub.makesense.domain.Segmentation;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -36,6 +38,12 @@ public class SegmentationDTO implements Serializable {
 
     public void setAnnotation(AnnotationDTO annotation) {
         this.annotation = annotation;
+    }
+
+    public SegmentationDTO(Segmentation segmentation, AnnotationDTO annotationDTO) {
+        this.id = segmentation.getId();
+        this.coordinate = segmentation.getCoordinate();
+        this.annotation = annotationDTO;
     }
 
     @Override

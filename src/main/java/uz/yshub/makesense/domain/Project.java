@@ -3,6 +3,7 @@ package uz.yshub.makesense.domain;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import uz.yshub.makesense.domain.enumeration.ProjectTypeEnum;
+import uz.yshub.makesense.service.dto.ProjectDTO;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -31,6 +32,10 @@ public class Project extends AbstractAuditingEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private ProjectTypeEnum type;
+
+    public Project() {
+
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -71,6 +76,12 @@ public class Project extends AbstractAuditingEntity implements Serializable {
 
     public void setType(ProjectTypeEnum type) {
         this.type = type;
+    }
+
+    public Project(ProjectDTO projectDTO) {
+        this.id = projectDTO.getId();
+        this.description = projectDTO.getDescription();
+        this.type = projectDTO.getType();
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
