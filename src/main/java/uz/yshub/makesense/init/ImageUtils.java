@@ -1,9 +1,13 @@
 package uz.yshub.makesense.init;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ImageUtils {
 
@@ -12,6 +16,27 @@ public class ImageUtils {
 //        int height = (int) (source.getHeight() * ratio);
 //        return getBufferedImage(source, width, height);
 //    }
+
+    // convert BufferedImage to byte[]
+    public static byte[] toByteArray(BufferedImage bi, String format)
+            throws IOException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bi, format, baos);
+        byte[] bytes = baos.toByteArray();
+        return bytes;
+
+    }
+
+    // convert byte[] to BufferedImage
+    public static BufferedImage toBufferedImage(byte[] bytes)
+            throws IOException {
+
+        InputStream is = new ByteArrayInputStream(bytes);
+        BufferedImage bi = ImageIO.read(is);
+        return bi;
+
+    }
 
     public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
         BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, originalImage.getType());

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.domain.Image;
 
 import java.io.Serializable;
@@ -36,6 +37,10 @@ public class ImageDTO implements Serializable {
 
     private Integer height;
 
+    private String thumbnailFileName;
+
+    private Catalog catalog;
+
     public ImageDTO(Image image) {
         this.id = image.getId();
         this.path = image.getPath();
@@ -46,6 +51,8 @@ public class ImageDTO implements Serializable {
         this.fileSize = image.getFileSize();
         this.width = image.getWidth();
         this.height = image.getHeight();
+        this.thumbnailFileName = image.getThumbnailFileName();
+        this.catalog = image.getCatalog();
     }
 
     @Override
@@ -69,18 +76,20 @@ public class ImageDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "ImageDTO{" +
-            "id=" + getId() +
-            ", path='" + getPath() + "'" +
-            ", originalFileName='" + getOriginalFileName() + "'" +
-            ", fileName='" + getFileName() + "'" +
-            ", contentType='" + getContentType() + "'" +
-            ", fileSize='" + getFileSize() + "'" +
-            ", width=" + getWidth() +
-            ", height=" + getHeight() +
-            "}";
+                "id=" + id +
+                ", path='" + path + '\'' +
+                ", originalFileName='" + originalFileName + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", contentType='" + contentType + '\'' +
+                ", suffix='" + suffix + '\'' +
+                ", fileSize='" + fileSize + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", thumbnailFileName='" + thumbnailFileName + '\'' +
+                ", catalog=" + catalog +
+                '}';
     }
 }

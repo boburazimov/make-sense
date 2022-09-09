@@ -29,12 +29,14 @@ public class Image extends AbstractAuditingEntity implements Serializable {
     @Column(name = "original_file_name")
     private String originalFileName;
 
+    /* File stored in Server under this name. */
     @Column(name = "file_name")
     private String fileName;
 
     @Column(name = "content_type")
     private String contentType;
 
+    /* Extension of file (jpg, png, etc) */
     @Column(name = "suffix")
     private String suffix;
 
@@ -47,9 +49,14 @@ public class Image extends AbstractAuditingEntity implements Serializable {
     @Column(name = "height")
     private Integer height;
 
-    public Image() {
+    /* Resized name of Original Image */
+    @Column(name = "thumbnail_file_name")
+    private String thumbnailFileName;
 
-    }
+    @ManyToOne
+    private Catalog catalog;
+
+    public Image() {}
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -165,6 +172,22 @@ public class Image extends AbstractAuditingEntity implements Serializable {
         this.height = height;
     }
 
+    public String getThumbnailFileName() {
+        return thumbnailFileName;
+    }
+
+    public void setThumbnailFileName(String thumbnailFileName) {
+        this.thumbnailFileName = thumbnailFileName;
+    }
+
+    public Catalog getCatalog() {
+        return catalog;
+    }
+
+    public void setCatalog(Catalog catalog) {
+        this.catalog = catalog;
+    }
+
     public Image(ImageDTO imageDTO) {
         this.id = imageDTO.getId();
         this.path = imageDTO.getPath();
@@ -175,6 +198,8 @@ public class Image extends AbstractAuditingEntity implements Serializable {
         this.fileSize = imageDTO.getFileSize();
         this.width = imageDTO.getWidth();
         this.height = imageDTO.getHeight();
+        this.thumbnailFileName = imageDTO.getThumbnailFileName();
+        this.catalog = imageDTO.getCatalog();
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

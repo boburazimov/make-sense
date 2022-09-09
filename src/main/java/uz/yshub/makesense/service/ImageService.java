@@ -12,16 +12,20 @@ public interface ImageService {
 
     /**
      * Upload the images.
-     * @param images Files to storage
-     * @return List of ImageDTO
+     * @param images Files to storage.
+     * @param bucket Bucket name in minio.
+     * @param catalogId catalogID of Catalog/Package.
+     * @return List of ImageDTO.
      */
-    List<ImageDTO> uploadImages(MultipartFile[] images);
+    List<ImageDTO> uploadImages(MultipartFile[] images, String bucket, String catalogId);
 
     /**
      * Upload the image.
-     * @param image File to storage
+     * @param image File to storage.
+     * @param bucket Bucket name in minio.
+     * @param catalogId catalogID of Catalog/Package.
      * @return Object of ImageDTO.
      */
-    ImageDTO uploadImage(MultipartFile image);
+    ImageDTO uploadImage(MultipartFile image, String bucket, String catalogId);
 
 }

@@ -5,17 +5,16 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.domain.Image;
+import uz.yshub.makesense.repository.CatalogRepository;
 import uz.yshub.makesense.repository.ImageRepository;
 import uz.yshub.makesense.service.ImageService;
 import uz.yshub.makesense.service.dto.ImageDTO;
 import uz.yshub.makesense.service.mapper.ImageMapper;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -35,32 +34,35 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final ImageMapper imageMapper;
     private final MinioService minioService;
+    private final CatalogRepository catalogRepository;
+
+    @Value("${minio.image.small.name.suffix}")
+    private String smallNameSuffix;
 
     @SneakyThrows
     @Override
-    public List<ImageDTO> uploadImages(MultipartFile[] files) {
+    public List<ImageDTO> uploadImages(MultipartFile[] files, String bucket, String catalogId) {
         log.debug("Request to upload all files to uploadImages method");
 
         List<ImageDTO> uploads = new ArrayList<>();
-
         for (MultipartFile file : files) {
-            uploads.add(uploadImage(file));
+            uploads.add(uploadImage(file, bucket, catalogId));
         }
         return uploads;
     }
 
     @Override
-    public ImageDTO uploadImage(MultipartFile multipartFile) {
+    public ImageDTO uploadImage(MultipartFile multipartFile, String bucket, String catalogId) {
         log.debug("Request to upload one file to uploadImage method");
 
-        Image image = createAttachment(multipartFile);
-        minioService.uploadFile(multipartFile, image);
-        Image savedImage = imageRepository.save(image);
+        Image image = createAttachment(multipartFile, catalogId);
+        Image fullImage = minioService.uploadFile(multipartFile, image, bucket);
+        Image savedImage = imageRepository.save(fullImage);
         log.debug("Response to upload one file to uploadImage method");
         return imageMapper.toDto(savedImage);
     }
 
-    public Image createAttachment(MultipartFile multipartFile) {
+    private Image createAttachment(MultipartFile multipartFile, String catalogId) {
         log.debug("Request to create attachment method!");
         Image attachment = new Image();
         try {
@@ -68,39 +70,41 @@ public class ImageServiceImpl implements ImageService {
             String originalFileName = encodeFileName(multipartFile.getOriginalFilename());
 
             // Get file extension/suffix from fileName (MyPhoto.jpg => jpg).
-            String extension = FilenameUtils.getExtension(originalFileName);
+            String suffix = FilenameUtils.getExtension(originalFileName);
 
             // Generate unique name for file and ID for Image.
             UUID uniqueName = UUID.randomUUID();
 
-            // Get file name without extension from fileName (MyPhoto.jpg => MyPhoto).
-            String fileName = uniqueName + (extension.isEmpty() ? "" : '.' + extension);
+            // Make unique file name + suffix.
+            String fileName = uniqueName + (suffix.isEmpty() ? "" : '.' + suffix);
 
-            // Time prefix as catalog.
+            // Make unique file name + key word of thumbnail image + suffix.
+            String thumbnailFileName = uniqueName + smallNameSuffix + (suffix.isEmpty() ? "" : '.' + suffix);
+
+            // Time prefix as package.
             String timePrefix = new SimpleDateFormat("yyyy-MM").format(new Date());
 
             // Make new full file name / path.
-            String fileNameAndExtension = timePrefix + File.separator + fileName;
+            String packageAndFileName = timePrefix + File.separator + fileName;
 
-//            File file = multipartToFile(multipartFile);
-//            BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(multipartFile.getBytes()));
-
-            // Start to fill attachment model for write to Database
-            attachment.setPath(fileNameAndExtension);
+            // Start to fill attachment model.
+            attachment.setPath(packageAndFileName);
             attachment.setOriginalFileName(originalFileName);
             attachment.setFileName(fileName);
             attachment.setContentType(multipartFile.getContentType());
-            attachment.setSuffix(extension);
+            attachment.setSuffix(suffix);
             attachment.setFileSize(String.valueOf(multipartFile.getSize()));
-            attachment.setWidth(1);
-            attachment.setHeight(1);
+            attachment.setThumbnailFileName(thumbnailFileName);
+            if (catalogId != null && catalogId.length() > 0) {
+                catalogRepository.findById(Long.valueOf(catalogId)).ifPresent(attachment::setCatalog);
+            }
             return attachment;
         } catch (Exception e) {
             throw new RuntimeException("Could not create the file. Error: " + e.getMessage());
         }
     }
 
-    public File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException {
+    private File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException {
         File convFile = new File(Objects.requireNonNull(multipart.getOriginalFilename()));
         multipart.transferTo(convFile);
         return convFile;

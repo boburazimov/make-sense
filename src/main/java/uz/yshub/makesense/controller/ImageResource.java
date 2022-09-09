@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import uz.yshub.makesense.config.MinioConfig;
 import uz.yshub.makesense.controller.errors.BadRequestAlertException;
 import uz.yshub.makesense.repository.ImageRepository;
 import uz.yshub.makesense.service.ImageService;
@@ -33,6 +34,7 @@ public class ImageResource {
     private final Logger log = LoggerFactory.getLogger(ImageResource.class);
 
     private final ImageService imageService;
+    private final MinioConfig minioConfig;
     private final ImageRepository imageRepository;
 
     /**
@@ -43,15 +45,19 @@ public class ImageResource {
      * @throws BadRequestAlertException if the files array are empty (Null).
      */
     @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponseDTO> uploadFiles(@RequestPart(value = "files") MultipartFile[] files, @RequestParam("bucket") String bucket) {
+    public ResponseEntity<ApiResponseDTO> uploadFiles(
+            @RequestPart(value = "files") MultipartFile[] files,
+            @RequestParam(value = "bucket", required = false) String bucket,
+            @RequestParam(value = "catalogId", required = false) String catalogId) {
         log.debug("REST request to upload an images");
 
         if (files == null && files.length > 0) {
             throw new BadRequestAlertException("File must not be null!", "imageManagement", "fileNullPointer");
         }
 
+        bucket = bucket == null ? minioConfig.getBucketDefaultName() : bucket;
         try {
-            List<ImageDTO> images = imageService.uploadImages(files);
+            List<ImageDTO> images = imageService.uploadImages(files, bucket, catalogId);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDTO(true, "Uploaded the images successfully", images));
         } catch (Exception e) {
             e.printStackTrace();

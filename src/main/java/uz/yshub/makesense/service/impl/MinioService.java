@@ -14,7 +14,6 @@ import uz.yshub.makesense.init.ImageUtils;
 import uz.yshub.makesense.service.dto.FileModel;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,42 +36,47 @@ public class MinioService {
     private int height;
 
     @SneakyThrows
-    public void uploadFile(MultipartFile multipartFile, Image image) {
+    public Image uploadFile(MultipartFile multipartFile, Image image, String bucket) {
         log.debug("Request to upload one file in by MinioClient");
 
-        // Get default bucket name from properties.
-        String bucketDefaultName = minioConfig.getBucketDefaultName();
-
         // Make 'bucketDefaultName' bucket if not exist.
-        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketDefaultName).build())) {
+        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
             // Make a new bucket.
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketDefaultName).build());
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
 
         // Make builder file for put Object into Minio.
-        PutObjectArgs.Builder putObjectArgs = makePutObjectArgs(multipartFile, image, bucketDefaultName);
+        PutObjectArgs.Builder putObjectArgs = makePutObjectArgs(multipartFile, image, bucket);
 
         // Upload 'fileName' as object name 'fileNameAndExtension' to bucket 'bucketDefaultName'.
         minioClient.putObject(putObjectArgs.build());
 
-        // Start to resize success stored image.
+        BufferedImage thumbnailBufferedImage = makeThumbnailImageFromStoredImage(bucket, image);
+
+        // Make builder for put resized Object into Minio.
+        PutObjectArgs.Builder resizedPutObjectArgs = makePutObjectArgsByBufferedImage(thumbnailBufferedImage, image, bucket);
+
+        // Upload resized image 'fileName' as object name 'fileNameAndExtension' to bucket 'bucketDefaultName'.
+        minioClient.putObject(resizedPutObjectArgs.build());
+
+        // Fill last two field of Image.
+        image.setWidth(thumbnailBufferedImage.getWidth());
+        image.setHeight(thumbnailBufferedImage.getHeight());
+        return image;
+    }
+
+    @SneakyThrows
+    private BufferedImage makeThumbnailImageFromStoredImage(String bucket, Image image) {
+        log.debug("Request to makeThumbnailImageFromStoredImage method MinioClient");
+
         // Get object from minio.
-        InputStream savedImageInputStream = getObjectByBucketNameAndFileName(bucketDefaultName, image.getPath());
+        InputStream savedImageInputStream = getObjectByBucketNameAndFileName(bucket, image.getPath());
 
         // Create BufferredImage
         BufferedImage bimg = ImageIO.read(savedImageInputStream);
 
         // Resize image and return new resizedImage.
-        BufferedImage resizedImage = ImageUtils.resizeImage(bimg, width, height);
-
-        // Make new full file name / path.
-        image.setPath(image.getPath() + "_thumbnail");
-
-        // Make builder for put resized Object into Minio.
-        PutObjectArgs.Builder resizedPutObjectArgs = makePutObjectArgsByBufferedImage(bimg, image, bucketDefaultName);
-
-        // Upload resized image 'fileName' as object name 'fileNameAndExtension' to bucket 'bucketDefaultName'.
-        minioClient.putObject(resizedPutObjectArgs.build());
+        return ImageUtils.resizeImage(bimg, width, height);
     }
 
     /**
@@ -95,19 +99,9 @@ public class MinioService {
 
         Map<String, String> headers = generalMakePutObjectArgs(image);
 
-        final ByteArrayOutputStream output = new ByteArrayOutputStream() {
-            @Override
-            public synchronized byte[] toByteArray() {
-                return this.buf;
-            }
-        };
-        ImageIO.write(bufferedImage, image.getSuffix(), output);
-        InputStream inputStream = new ByteArrayInputStream(output.toByteArray(), 0, output.size());
-
-//        ByteArrayOutputStream os = new ByteArrayOutputStream();
-//        ImageIO.write(bufferedImage, image.getSuffix(), os);
-////        ImageInputStream imageInputStream = ImageIO.createImageInputStream(bufferedImage);
-//        InputStream inputStream = new ByteArrayInputStream(os.toByteArray());
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, image.getSuffix(), os);
+        InputStream inputStream = new ByteArrayInputStream(os.toByteArray());
 
         PutObjectArgs.Builder builder;
         builder = PutObjectArgs.builder()
@@ -116,7 +110,7 @@ public class MinioService {
                 .contentType(image.getContentType())
                 .headers(headers)
                 .tags(headers)
-                .stream(inputStream, Long.parseLong(image.getFileSize()), -1);
+                .stream(inputStream, inputStream.available(), -1);
         return builder;
     }
 
