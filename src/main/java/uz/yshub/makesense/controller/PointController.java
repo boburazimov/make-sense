@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uz.yshub.makesense.payload.MessageResponse;
+import uz.yshub.makesense.payload.ApiResponse;
 import uz.yshub.makesense.service.dto.PointDto;
 import uz.yshub.makesense.service.impl.PointServiceImpl;
 
@@ -26,6 +26,6 @@ public class PointController {
     @PostMapping(value = "/point")
     public ResponseEntity<?> point(@RequestBody List<PointDto> pointDto) {
         pointService.save(pointDto);
-        return ResponseEntity.ok(new MessageResponse(true,"point annotations exported successfully",null));
+        return ResponseEntity.ok(new ApiResponse(true,"point annotations exported successfully",null));
     }
 }

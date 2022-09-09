@@ -28,6 +28,10 @@ public class Category implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
+    public Category() {
+
+    }
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
