@@ -55,7 +55,7 @@ public class ImageResource {
             throw new BadRequestAlertException("File must not be null!", "imageManagement", "fileNullPointer");
         }
 
-        bucket = bucket == null ? minioConfig.getBucketDefaultName() : bucket;
+        bucket = (bucket == null && bucket.length() > 0) ? minioConfig.getBucketDefaultName() : bucket;
         try {
             List<ImageDTO> images = imageService.uploadImages(files, bucket, catalogId);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDTO(true, "Uploaded the images successfully", images));

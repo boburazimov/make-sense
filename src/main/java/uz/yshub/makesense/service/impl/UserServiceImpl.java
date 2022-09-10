@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.yshub.makesense.domain.Role;
 import uz.yshub.makesense.domain.User;
+import uz.yshub.makesense.domain.enumeration.ERole;
 import uz.yshub.makesense.payload.LoginRequest;
 import uz.yshub.makesense.payload.ApiResponse;
 import uz.yshub.makesense.payload.SignupRequest;
@@ -54,10 +55,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         if (request.getRole() != null) {
             Set<Role> roles = request.getRole().stream()
-                    .map(roleRepository::findOneByName)
+                    .map(ERole::valueOf)
+                    .map(roleRepository::findByName)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toSet());
+            user.setRoles(roles);
         } else {
             Set<Role> roles = new HashSet<>();
             roleRepository.findOneByName(AuthoritiesConstants.USER).ifPresent(roles::add);
