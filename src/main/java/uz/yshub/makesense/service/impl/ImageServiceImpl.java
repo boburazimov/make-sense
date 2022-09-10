@@ -3,6 +3,7 @@ package uz.yshub.makesense.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +21,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Service Implementation for managing {@link Image}.
@@ -56,8 +59,8 @@ public class ImageServiceImpl implements ImageService {
         log.debug("Request to upload one file to uploadImage method");
 
         Image image = createAttachment(multipartFile, catalogId);
-        Image fullImage = minioService.uploadFile(multipartFile, image, bucket);
-        Image savedImage = imageRepository.save(fullImage);
+        minioService.uploadFile(multipartFile, image, bucket);
+        Image savedImage = imageRepository.save(image);
         log.debug("Response to upload one file to uploadImage method");
         return imageMapper.toDto(savedImage);
     }
@@ -75,27 +78,30 @@ public class ImageServiceImpl implements ImageService {
             // Generate unique name for file and ID for Image.
             UUID uniqueName = UUID.randomUUID();
 
+            // Make dot + suffix.
+            String dotSuffix = suffix.isEmpty() ? "" : '.' + suffix;
+
             // Make unique file name + suffix.
-            String fileName = uniqueName + (suffix.isEmpty() ? "" : '.' + suffix);
+            String fileName = uniqueName + dotSuffix;
 
             // Make unique file name + key word of thumbnail image + suffix.
-            String thumbnailFileName = uniqueName + smallNameSuffix + (suffix.isEmpty() ? "" : '.' + suffix);
+            String thumbnailFileName = uniqueName + smallNameSuffix + dotSuffix;
 
-            // Time prefix as package.
-            String timePrefix = new SimpleDateFormat("yyyy-MM").format(new Date());
-
-            // Make new full file name / path.
-            String packageAndFileName = timePrefix + File.separator + fileName;
+//            // Time prefix as package.
+//            String timePrefix = new SimpleDateFormat("yyyy-MM").format(new Date());
+//
+//            // Make new full file name / path.
+//            String packageAndFileName = timePrefix + File.separator + fileName;
 
             // Start to fill attachment model.
-            attachment.setPath(packageAndFileName);
+            attachment.setPath(fileName);
             attachment.setOriginalFileName(originalFileName);
             attachment.setFileName(fileName);
             attachment.setContentType(multipartFile.getContentType());
             attachment.setSuffix(suffix);
             attachment.setFileSize(String.valueOf(multipartFile.getSize()));
             attachment.setThumbnailFileName(thumbnailFileName);
-            if (catalogId != null && catalogId.length() > 0) {
+            if (StringUtils.isNotEmpty(catalogId)) {
                 catalogRepository.findById(Long.valueOf(catalogId)).ifPresent(attachment::setCatalog);
             }
             return attachment;

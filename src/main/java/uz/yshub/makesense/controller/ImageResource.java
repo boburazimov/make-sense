@@ -3,6 +3,7 @@ package uz.yshub.makesense.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.api.annotations.ParameterObject;
@@ -55,7 +56,7 @@ public class ImageResource {
             throw new BadRequestAlertException("File must not be null!", "imageManagement", "fileNullPointer");
         }
 
-        bucket = (bucket == null && bucket.length() > 0) ? minioConfig.getBucketDefaultName() : bucket;
+        bucket = (StringUtils.isEmpty(bucket)) ? minioConfig.getBucketDefaultName() : bucket;
         try {
             List<ImageDTO> images = imageService.uploadImages(files, bucket, catalogId);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponseDTO(true, "Uploaded the images successfully", images));

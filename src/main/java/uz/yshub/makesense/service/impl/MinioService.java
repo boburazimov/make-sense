@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.yshub.makesense.config.MinioConfig;
 import uz.yshub.makesense.domain.Image;
 import uz.yshub.makesense.init.ImageUtils;
 import uz.yshub.makesense.service.dto.FileModel;
@@ -28,7 +27,6 @@ public class MinioService {
 
     private final Logger log = LoggerFactory.getLogger(MinioService.class);
     private final MinioClient minioClient;
-    private final MinioConfig minioConfig;
 
     @Value("${minio.image.resize.width}")
     private int width;
@@ -36,7 +34,7 @@ public class MinioService {
     private int height;
 
     @SneakyThrows
-    public Image uploadFile(MultipartFile multipartFile, Image image, String bucket) {
+    public GenericResponse uploadFile(MultipartFile multipartFile, Image image, String bucket) {
         log.debug("Request to upload one file in by MinioClient");
 
         // Make 'bucketDefaultName' bucket if not exist.
@@ -48,7 +46,7 @@ public class MinioService {
         // Make builder file for put Object into Minio.
         PutObjectArgs.Builder putObjectArgs = makePutObjectArgs(multipartFile, image, bucket);
 
-        // Upload 'fileName' as object name 'fileNameAndExtension' to bucket 'bucketDefaultName'.
+        // Upload 'fileName' as object name 'fileNameAndExtension' to bucket.
         minioClient.putObject(putObjectArgs.build());
 
         BufferedImage thumbnailBufferedImage = makeThumbnailImageFromStoredImage(bucket, image);
@@ -57,12 +55,7 @@ public class MinioService {
         PutObjectArgs.Builder resizedPutObjectArgs = makePutObjectArgsByBufferedImage(thumbnailBufferedImage, image, bucket);
 
         // Upload resized image 'fileName' as object name 'fileNameAndExtension' to bucket 'bucketDefaultName'.
-        minioClient.putObject(resizedPutObjectArgs.build());
-
-        // Fill last two field of Image.
-        image.setWidth(thumbnailBufferedImage.getWidth());
-        image.setHeight(thumbnailBufferedImage.getHeight());
-        return image;
+        return minioClient.putObject(resizedPutObjectArgs.build());
     }
 
     @SneakyThrows
@@ -70,13 +63,17 @@ public class MinioService {
         log.debug("Request to makeThumbnailImageFromStoredImage method MinioClient");
 
         // Get object from minio.
-        InputStream savedImageInputStream = getObjectByBucketNameAndFileName(bucket, image.getPath());
+        InputStream savedImageInputStream = getObjectByBucketNameAndFileName(bucket, image.getFileName());
 
-        // Create BufferredImage
-        BufferedImage bimg = ImageIO.read(savedImageInputStream);
+        // Create BufferedImage
+        BufferedImage bufferedImage = ImageIO.read(savedImageInputStream);
+
+        // Fill last two field of Image.
+        image.setWidth(bufferedImage.getWidth());
+        image.setHeight(bufferedImage.getHeight());
 
         // Resize image and return new resizedImage.
-        return ImageUtils.resizeImage(bimg, width, height);
+        return ImageUtils.resizeImage(bufferedImage, width, height);
     }
 
     /**
@@ -94,7 +91,7 @@ public class MinioService {
     }
 
     @SneakyThrows
-    public PutObjectArgs.Builder makePutObjectArgsByBufferedImage(BufferedImage bufferedImage, Image image, String bucketDefaultName) {
+    public PutObjectArgs.Builder makePutObjectArgsByBufferedImage(BufferedImage bufferedImage, Image image, String bucketName) {
         log.debug("Request to make PutObjectArgsByBufferedImage builder");
 
         Map<String, String> headers = generalMakePutObjectArgs(image);
@@ -105,8 +102,8 @@ public class MinioService {
 
         PutObjectArgs.Builder builder;
         builder = PutObjectArgs.builder()
-                .bucket(bucketDefaultName)
-                .object(image.getPath())
+                .bucket(bucketName)
+                .object(image.getThumbnailFileName())
                 .contentType(image.getContentType())
                 .headers(headers)
                 .tags(headers)
