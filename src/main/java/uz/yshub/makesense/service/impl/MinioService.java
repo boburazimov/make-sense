@@ -1,6 +1,7 @@
 package uz.yshub.makesense.service.impl;
 
 import io.minio.*;
+import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -8,15 +9,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import uz.yshub.makesense.controller.utils.ImageUtils;
 import uz.yshub.makesense.domain.Image;
-import uz.yshub.makesense.init.ImageUtils;
 import uz.yshub.makesense.service.dto.FileModel;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +38,7 @@ public class MinioService {
     private int height;
 
     @SneakyThrows
-    public GenericResponse uploadFile(MultipartFile multipartFile, Image image, String bucket) {
+    public void uploadFile(MultipartFile multipartFile, Image image, String bucket) {
         log.debug("Request to upload one file in by MinioClient");
 
         // Make 'bucketDefaultName' bucket if not exist.
@@ -43,11 +47,16 @@ public class MinioService {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
 
+
+        String bucketPolicy = minioClient.getBucketPolicy(GetBucketPolicyArgs.builder().bucket(bucket).build());
+        System.out.println(bucketPolicy);
+
+
         // Make builder file for put Object into Minio.
         PutObjectArgs.Builder putObjectArgs = makePutObjectArgs(multipartFile, image, bucket);
 
         // Upload 'fileName' as object name 'fileNameAndExtension' to bucket.
-        minioClient.putObject(putObjectArgs.build());
+        finalUploadImage(putObjectArgs, image.getFileName(), bucket);
 
         BufferedImage thumbnailBufferedImage = makeThumbnailImageFromStoredImage(bucket, image);
 
@@ -55,7 +64,13 @@ public class MinioService {
         PutObjectArgs.Builder resizedPutObjectArgs = makePutObjectArgsByBufferedImage(thumbnailBufferedImage, image, bucket);
 
         // Upload resized image 'fileName' as object name 'fileNameAndExtension' to bucket 'bucketDefaultName'.
-        return minioClient.putObject(resizedPutObjectArgs.build());
+        finalUploadImage(resizedPutObjectArgs, image.getThumbnailFileName(), bucket);
+    }
+
+    @SneakyThrows
+    private void finalUploadImage(PutObjectArgs.Builder putObject, String fileName, String bucket){
+        minioClient.putObject(putObject.build());
+        log.debug("Image success saved: " + fileName + ". To bucket: " + bucket);
     }
 
     @SneakyThrows
@@ -108,14 +123,15 @@ public class MinioService {
                 .headers(headers)
                 .tags(headers)
                 .stream(inputStream, inputStream.available(), -1);
+        inputStream.close();
         return builder;
     }
 
     private Map<String, String> generalMakePutObjectArgs(Image image) {
         Map<String, String> headers = new ConcurrentHashMap<>();
         headers.put(FileModel.size, image.getFileSize() + "");
-        headers.put(FileModel.name, image.getPath());         // файл новое имя
-        headers.put(FileModel.oldName, image.getOriginalFileName());   // исходное имя файла
+        headers.put(FileModel.name, image.getFileName());
+        headers.put(FileModel.oldName, image.getOriginalFileName());
         headers.put(FileModel.contentType, image.getContentType());
         headers.put(FileModel.suffix, image.getSuffix());
         headers.put(FileModel.uploadDate, new Date().toString());
@@ -130,11 +146,15 @@ public class MinioService {
         PutObjectArgs.Builder builder;
         builder = PutObjectArgs.builder()
                 .bucket(bucketDefaultName)
-                .object(image.getPath())
+                .object(image.getFileName())
                 .contentType(image.getContentType())
                 .headers(headers)
                 .tags(headers)
                 .stream(multipartFile.getInputStream(), Long.parseLong(image.getFileSize()), -1);
         return builder;
+    }
+
+    public void abc() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.downloadObject(DownloadObjectArgs.builder().build());
     }
 }

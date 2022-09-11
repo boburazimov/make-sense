@@ -1,6 +1,7 @@
 package uz.yshub.makesense.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import uz.yshub.makesense.service.dto.ImageCustomDTO;
 import uz.yshub.makesense.service.dto.ImageDTO;
 
 import java.util.List;
@@ -28,4 +29,10 @@ public interface ImageService {
      */
     ImageDTO uploadImage(MultipartFile image, String bucket, String catalogId);
 
+    /**
+     * Get all images by exist Catalog ID or Catalog ID is null .
+     * @param catalogId catalogID of Catalog/Package.
+     * @return List of ImageCustomDTO.
+     */
+    List<ImageCustomDTO> getAllByCatalogId(Long catalogId);
 }

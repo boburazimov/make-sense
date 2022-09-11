@@ -1,6 +1,7 @@
 package uz.yshub.makesense.domain;
 
 import lombok.*;
+import uz.yshub.makesense.service.dto.CatalogDTO;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

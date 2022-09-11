@@ -2,9 +2,9 @@ package uz.yshub.makesense.service;
 
 import org.springframework.transaction.annotation.Transactional;
 import uz.yshub.makesense.domain.User;
-import uz.yshub.makesense.payload.LoginRequest;
-import uz.yshub.makesense.payload.ApiResponse;
-import uz.yshub.makesense.payload.SignupRequest;
+import uz.yshub.makesense.service.dto.LoginRequest;
+import uz.yshub.makesense.service.dto.ApiResponse;
+import uz.yshub.makesense.service.dto.SignupRequest;
 
 import java.util.Optional;
 

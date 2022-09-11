@@ -1,8 +1,10 @@
 package uz.yshub.makesense.service;
 
 import uz.yshub.makesense.domain.Catalog;
+import uz.yshub.makesense.service.dto.CatalogDTO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -16,7 +18,7 @@ public interface CatalogService {
      * @param catalog the entity to save.
      * @return the persisted entity.
      */
-    Catalog save(Catalog catalog);
+    Catalog save(CatalogDTO catalog);
 
     /**
      * Updates a catalog.
@@ -47,4 +49,12 @@ public interface CatalogService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    /**
+     * Get all child catalog and images by the "id" catalog.
+     *
+     * @param id the id of the entity.
+     * @return {@link Map} with catalogs and images.
+     */
+    Map<String, Object> getCatalogsAndImages(Long id);
 }

@@ -1,10 +1,12 @@
 package uz.yshub.makesense.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.yshub.makesense.controller.errors.BadRequestAlertException;
@@ -12,10 +14,10 @@ import uz.yshub.makesense.controller.utils.ResponseUtil;
 import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.repository.CatalogRepository;
 import uz.yshub.makesense.service.CatalogService;
+import uz.yshub.makesense.service.dto.CatalogDTO;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import javax.validation.constraints.Null;
+import java.util.*;
 
 /**
  * REST controller for managing {@link uz.yshub.makesense.domain.Catalog}.
@@ -36,10 +38,12 @@ public class CatalogResource {
      * {@code POST  /catalogs} : Create a new catalog.
      *
      * @param catalog the catalog to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new catalog, or with status {@code 400 (Bad Request)} if the catalog has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new catalog,
+     * or with status {@code 400 (Bad Request)} if the catalog has already an ID.
+     * TODO: Fix createCatalog method with non null exist Parent catalog.
      */
     @PostMapping
-    public ResponseEntity<Catalog> createCatalog(@RequestBody Catalog catalog) {
+    public ResponseEntity<Catalog> createCatalog(@RequestBody CatalogDTO catalog) {
         log.debug("REST request to save Catalog : {}", catalog);
 
         if (catalog.getId() != null) {
@@ -87,16 +91,22 @@ public class CatalogResource {
     }
 
     /**
-     * {@code GET /:id} : get the "id" catalog.
+     * {@code GET /:id} : get the "id" catalog and child catalogs with images.
      *
      * @param id the id of the catalog to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the catalog, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Catalog> getCatalog(@PathVariable Long id) {
-        log.debug("REST request to get Catalog : {}", id);
-        Optional<Catalog> catalog = catalogService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(catalog);
+    @GetMapping("/img")
+    @Operation(description = "Get all catalogs and imageUrls by catalog ID", method = "Get all catalogs and imageUrls by catalog ID")
+    public ResponseEntity<Map<String, Object>> getCatalogsAndImages(@RequestParam(name = "id", required = false) final Long id) {
+        log.debug("REST request to get Catalogs and Images by catalog ID: {}", id);
+
+        if (id != null && !catalogRepository.existsById(id)) {
+            throw new IllegalArgumentException("Given catalog ID: {}" + id + " is invalid!");
+        }
+
+        Map<String, Object> list = catalogService.getCatalogsAndImages(id);
+        return ResponseEntity.status(list.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK).body(list);
     }
 
     /**

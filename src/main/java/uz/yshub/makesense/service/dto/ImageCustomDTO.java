@@ -4,24 +4,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.domain.Image;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link uz.yshub.makesense.domain.Image} entity.
+ * A DTO for the {@link Image} entity.
  */
 @Schema(description = "Image entity.")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ImageDTO implements Serializable {
+public class ImageCustomDTO implements Serializable {
 
     private Long id;
 
-    private String path;
+    private String originalFileUrl;
+
+    private String thumbnailFileUrl;
 
     private String originalFileName;
 
@@ -29,33 +30,20 @@ public class ImageDTO implements Serializable {
 
     private String contentType;
 
-    private String suffix;
-
     private String fileSize;
 
     private Integer width;
 
     private Integer height;
 
-    private String thumbnailFileName;
-
-    private String bucketName;
-
-    private Catalog catalog;
-
-    public ImageDTO(Image image) {
+    public ImageCustomDTO(Image image) {
         this.id = image.getId();
-        this.path = image.getPath();
         this.originalFileName = image.getOriginalFileName();
         this.fileName = image.getFileName();
         this.contentType = image.getContentType();
-        this.suffix = image.getSuffix();
         this.fileSize = image.getFileSize();
         this.width = image.getWidth();
         this.height = image.getHeight();
-        this.thumbnailFileName = image.getThumbnailFileName();
-        this.bucketName = image.getBucketName();
-        this.catalog = image.getCatalog();
     }
 
     @Override
@@ -63,11 +51,11 @@ public class ImageDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ImageDTO)) {
+        if (!(o instanceof ImageCustomDTO)) {
             return false;
         }
 
-        ImageDTO imageDTO = (ImageDTO) o;
+        ImageCustomDTO imageDTO = (ImageCustomDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -81,18 +69,16 @@ public class ImageDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "ImageDTO{" +
+        return "ImageCustomDTO{" +
                 "id=" + id +
-                ", path='" + path + '\'' +
+                ", pathOriginalFile='" + originalFileUrl + '\'' +
+                ", pathThumbnailFile='" + thumbnailFileUrl + '\'' +
                 ", originalFileName='" + originalFileName + '\'' +
                 ", fileName='" + fileName + '\'' +
                 ", contentType='" + contentType + '\'' +
-                ", suffix='" + suffix + '\'' +
                 ", fileSize='" + fileSize + '\'' +
                 ", width=" + width +
                 ", height=" + height +
-                ", thumbnailFileName='" + thumbnailFileName + '\'' +
-                ", catalog=" + catalog +
                 '}';
     }
 }

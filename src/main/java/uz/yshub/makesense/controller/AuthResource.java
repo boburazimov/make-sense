@@ -10,15 +10,14 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.yshub.makesense.domain.User;
-import uz.yshub.makesense.payload.LoginRequest;
-import uz.yshub.makesense.payload.ApiResponse;
-import uz.yshub.makesense.payload.SignupRequest;
 import uz.yshub.makesense.repository.UserRepository;
 import uz.yshub.makesense.security.jwt.JwtUtils;
 import uz.yshub.makesense.service.UserService;
+import uz.yshub.makesense.service.dto.ApiResponse;
+import uz.yshub.makesense.service.dto.LoginRequest;
+import uz.yshub.makesense.service.dto.SignupRequest;
 import uz.yshub.makesense.service.dto.UserDTO;
 
-import javax.security.auth.login.AccountException;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
@@ -62,7 +61,6 @@ public class AuthResource {
      * @param signUpRequest the user to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new user.
      * or with status {@code 400 (Bad Request)} if the login or email is already in use.
-     * @throws {@code 400 (Bad Request)} if the login or email is already in use.
      */
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -92,7 +90,7 @@ public class AuthResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public UserDTO getAccount() throws AccountException {
+    public UserDTO getAccount() {
         return userService
                 .getUserWithAuthorities()
                 .map(UserDTO::new)

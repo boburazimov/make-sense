@@ -36,7 +36,6 @@ public class ImageResource {
 
     private final ImageService imageService;
     private final MinioConfig minioConfig;
-    private final ImageRepository imageRepository;
 
     /**
      * {@code POST  /images} : Upload images.
@@ -52,7 +51,7 @@ public class ImageResource {
             @RequestParam(value = "catalogId", required = false) String catalogId) {
         log.debug("REST request to upload an images");
 
-        if (files == null && files.length > 0) {
+        if (files == null) {
             throw new BadRequestAlertException("File must not be null!", "imageManagement", "fileNullPointer");
         }
 

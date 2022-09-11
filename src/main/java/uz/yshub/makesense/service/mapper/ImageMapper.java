@@ -1,8 +1,13 @@
 package uz.yshub.makesense.service.mapper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uz.yshub.makesense.domain.Image;
+import uz.yshub.makesense.service.dto.ImageCustomDTO;
 import uz.yshub.makesense.service.dto.ImageDTO;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Mapper for the entity {@link Image} and its DTO {@link ImageDTO}.
@@ -11,19 +16,15 @@ import uz.yshub.makesense.service.dto.ImageDTO;
 public class ImageMapper {
 
     public ImageDTO toDto(Image image) {
-        if (image != null) {
-            return new ImageDTO(image);
-        } else {
-            return null;
-        }
+        return ObjectUtils.isNotEmpty(image) ? new ImageDTO(image) : null;
+    }
+
+    public ImageCustomDTO toCustomDto(Image image){
+        return ObjectUtils.isNotEmpty(image) ? new ImageCustomDTO(image) : null;
     }
 
     public Image toEntity(ImageDTO imageDTO) {
-        if (imageDTO != null) {
-            return new Image(imageDTO);
-        } else {
-            return null;
-        }
+        return ObjectUtils.isNotEmpty(imageDTO) ? new Image(imageDTO) : null;
     }
 
     public void partialUpdate(Image entity, ImageDTO dto) {
@@ -56,5 +57,9 @@ public class ImageMapper {
         if (dto.getHeight() != null) {
             entity.setHeight(dto.getHeight());
         }
+    }
+
+    public List<ImageCustomDTO> toCustomDtos(List<Image> images) {
+        return images.stream().map(this::toCustomDto).collect(Collectors.toList());
     }
 }

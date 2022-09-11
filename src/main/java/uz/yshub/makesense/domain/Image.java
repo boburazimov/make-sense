@@ -1,5 +1,7 @@
 package uz.yshub.makesense.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import uz.yshub.makesense.service.dto.ImageDTO;
@@ -11,6 +13,8 @@ import java.io.Serializable;
  * Image entity.
  */
 @Entity
+@Getter
+@Setter
 @Table(name = "image")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Image extends AbstractAuditingEntity implements Serializable {
@@ -53,140 +57,15 @@ public class Image extends AbstractAuditingEntity implements Serializable {
     @Column(name = "thumbnail_file_name")
     private String thumbnailFileName;
 
+    @Column(name = "bucket_name")
+    private String bucketName;
+
     @ManyToOne
     private Catalog catalog;
 
     public Image() {}
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public Image id(Long id) {
-        this.setId(id);
-        return this;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPath() {
-        return this.path;
-    }
-
-    public Image path(String path) {
-        this.setPath(path);
-        return this;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getOriginalFileName() {
-        return this.originalFileName;
-    }
-
-    public Image originalFileName(String originalFileName) {
-        this.setOriginalFileName(originalFileName);
-        return this;
-    }
-
-    public void setOriginalFileName(String originalFileName) {
-        this.originalFileName = originalFileName;
-    }
-
-    public String getFileName() {
-        return this.fileName;
-    }
-
-    public Image fileName(String fileName) {
-        this.setFileName(fileName);
-        return this;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getContentType() {
-        return this.contentType;
-    }
-
-    public Image contentType(String contentType) {
-        this.setContentType(contentType);
-        return this;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-
-    public String getFileSize() {
-        return this.fileSize;
-    }
-
-    public Image fileSize(String fileSize) {
-        this.setFileSize(fileSize);
-        return this;
-    }
-
-    public void setFileSize(String fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public Integer getWidth() {
-        return this.width;
-    }
-
-    public Image width(Integer width) {
-        this.setWidth(width);
-        return this;
-    }
-
-    public void setWidth(Integer width) {
-        this.width = width;
-    }
-
-    public Integer getHeight() {
-        return this.height;
-    }
-
-    public Image height(Integer height) {
-        this.setHeight(height);
-        return this;
-    }
-
-    public void setHeight(Integer height) {
-        this.height = height;
-    }
-
-    public String getThumbnailFileName() {
-        return thumbnailFileName;
-    }
-
-    public void setThumbnailFileName(String thumbnailFileName) {
-        this.thumbnailFileName = thumbnailFileName;
-    }
-
-    public Catalog getCatalog() {
-        return catalog;
-    }
-
-    public void setCatalog(Catalog catalog) {
-        this.catalog = catalog;
-    }
 
     public Image(ImageDTO imageDTO) {
         this.id = imageDTO.getId();
@@ -199,6 +78,7 @@ public class Image extends AbstractAuditingEntity implements Serializable {
         this.width = imageDTO.getWidth();
         this.height = imageDTO.getHeight();
         this.thumbnailFileName = imageDTO.getThumbnailFileName();
+        this.bucketName = imageDTO.getBucketName();
         this.catalog = imageDTO.getCatalog();
     }
 

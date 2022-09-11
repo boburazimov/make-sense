@@ -1,4 +1,4 @@
-package uz.yshub.makesense.init;
+package uz.yshub.makesense.controller.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

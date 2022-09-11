@@ -1,4 +1,4 @@
-package uz.yshub.makesense.payload;
+package uz.yshub.makesense.service.dto;
 
 import java.util.List;
 

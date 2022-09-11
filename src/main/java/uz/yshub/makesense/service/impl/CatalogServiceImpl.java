@@ -8,8 +8,15 @@ import org.springframework.transaction.annotation.Transactional;
 import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.repository.CatalogRepository;
 import uz.yshub.makesense.service.CatalogService;
+import uz.yshub.makesense.service.ImageService;
+import uz.yshub.makesense.service.dto.CatalogDTO;
+import uz.yshub.makesense.service.dto.ImageCustomDTO;
+import uz.yshub.makesense.service.mapper.CatalogMapper;
+import uz.yshub.makesense.service.mapper.CategoryMapper;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -22,16 +29,23 @@ public class CatalogServiceImpl implements CatalogService {
 
     private final Logger log = LoggerFactory.getLogger(CatalogServiceImpl.class);
     private final CatalogRepository catalogRepository;
+    private final ImageService imageService;
+    private final CatalogMapper catalogMapper;
 
     @Override
-    public Catalog save(Catalog catalog) {
-        log.debug("Request to save Catalog : {}", catalog);
+    public Catalog save(CatalogDTO catalogDTO) {
+        log.debug("Request to save CatalogDTO : {}", catalogDTO);
+        Catalog catalog = new Catalog();
+        catalog.setName(catalogDTO.getName());
+        if (catalogDTO.getParentId() != null && catalogRepository.existsById(catalogDTO.getParentId())) {
+            catalog.setParent(catalogRepository.getById(catalogDTO.getParentId()));
+        }
         return catalogRepository.save(catalog);
     }
 
     @Override
     public Optional<Catalog> update(Catalog catalog) {
-        log.debug("Request to partially update Catalog : {}", catalog);
+        log.debug("Request to partially update Catalog: {}", catalog);
 
         return catalogRepository
                 .findById(catalog.getId())
@@ -60,5 +74,23 @@ public class CatalogServiceImpl implements CatalogService {
     public void delete(Long id) {
         log.debug("Request to delete Catalog : {}", id);
         catalogRepository.deleteById(id);
+    }
+
+    @Override
+    public Map<String, Object> getCatalogsAndImages(Long catalogId) {
+        log.debug("Request to get child Catalogs and Images by getCatalogsAndImages method: {}", catalogId);
+
+        boolean existId = catalogId != null && catalogRepository.existsById(catalogId);
+        Map<String, Object> list = new HashMap<>();
+
+        Optional<List<Catalog>> catalogList = existId
+                ? catalogRepository.findAllByParentId(catalogId)
+                : catalogRepository.findAllByParentIsNull();
+
+        catalogList.ifPresent(catalogs -> list.put("catalogs", catalogs));
+
+        List<ImageCustomDTO> imageList = imageService.getAllByCatalogId(catalogId);
+        list.put("images", imageList);
+        return list;
     }
 }
