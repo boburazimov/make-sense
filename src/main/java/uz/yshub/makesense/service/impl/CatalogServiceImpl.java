@@ -38,7 +38,8 @@ public class CatalogServiceImpl implements CatalogService {
         Catalog catalog = new Catalog();
         catalog.setName(catalogDTO.getName());
         if (catalogDTO.getParentId() != null && catalogRepository.existsById(catalogDTO.getParentId())) {
-            catalog.setParent(catalogRepository.getById(catalogDTO.getParentId()));
+            // TODO: check catalog name to unique by in parent catalog.
+            catalogRepository.findById(catalogDTO.getParentId()).ifPresent(catalog::setParent);
         }
         return catalogRepository.save(catalog);
     }
@@ -73,7 +74,13 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Catalog : {}", id);
-        catalogRepository.deleteById(id);
+//        catalogRepository.findById(id).ifPresent(catalog -> {
+//            catalogRepository.findAllByParentId()
+//            boolean exists = catalogRepository.exists(catalog.getParent());
+//
+//        });
+        catalogRepository.findById(id).ifPresent(catalogRepository::delete);
+//        catalogRepository.deleteById(id);
     }
 
     @Override

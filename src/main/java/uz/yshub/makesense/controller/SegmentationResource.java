@@ -23,6 +23,7 @@ import java.util.Optional;
  * REST controller for managing {@link uz.yshub.makesense.domain.Segmentation}.
  */
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api")
 public class SegmentationResource {
 

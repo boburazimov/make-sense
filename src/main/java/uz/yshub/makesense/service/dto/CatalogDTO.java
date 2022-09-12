@@ -14,7 +14,9 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CatalogDTO {
+public class CatalogDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
 

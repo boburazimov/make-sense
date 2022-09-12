@@ -27,6 +27,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Image", description = "The Image API. Contains all the operations that can be performed on a image.")
@@ -67,7 +68,7 @@ public class ImageResource {
 
     /**
      * {@code GET  /images} : get all the images.
-     *
+     * TODO: Fix this endpoint
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of images in body.
      */

@@ -27,6 +27,7 @@ import java.util.Optional;
  * REST controller for managing {@link uz.yshub.makesense.domain.Project}.
  */
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Project", description = "The Project API. Contains all the operations that can be performed on a project.")

@@ -1,11 +1,12 @@
 package uz.yshub.makesense.domain;
 
 import lombok.*;
-import uz.yshub.makesense.service.dto.CatalogDTO;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,8 +27,11 @@ public class Catalog implements Serializable {
     @Column(name = "name", nullable = false, length = 70)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private Catalog parent;
+//
+//    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private Set<Catalog> childs = new LinkedHashSet<>();
 
     public Catalog(String name, Catalog parent) {
         this.name = name;

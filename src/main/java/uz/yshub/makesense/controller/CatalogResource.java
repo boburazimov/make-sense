@@ -23,6 +23,7 @@ import java.util.*;
  * REST controller for managing {@link uz.yshub.makesense.domain.Catalog}.
  */
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/catalogs")
 @SecurityRequirement(name = "bearerAuth")
@@ -40,7 +41,7 @@ public class CatalogResource {
      * @param catalog the catalog to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new catalog,
      * or with status {@code 400 (Bad Request)} if the catalog has already an ID.
-     * TODO: Fix createCatalog method with non null exist Parent catalog.
+     * // TODO: Fix createCatalog method with non null exist Parent catalog.
      */
     @PostMapping
     public ResponseEntity<Catalog> createCatalog(@RequestBody CatalogDTO catalog) {
