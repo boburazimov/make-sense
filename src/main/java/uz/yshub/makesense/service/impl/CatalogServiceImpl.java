@@ -73,14 +73,13 @@ public class CatalogServiceImpl implements CatalogService {
 
     @Override
     public void delete(Long id) {
-        log.debug("Request to delete Catalog : {}", id);
-//        catalogRepository.findById(id).ifPresent(catalog -> {
-//            catalogRepository.findAllByParentId()
+        log.debug("Request to delete Catalog : {}", id); // 102
+//        catalogRepository.findById(id).ifPresent(catalog -> { // 102 bor
+//            catalog.setParent(null);
+//            catalogRepository.findAllByParentId(catalog.getId()).ifPresent(catalogs -> );
 //            boolean exists = catalogRepository.exists(catalog.getParent());
-//
 //        });
         catalogRepository.findById(id).ifPresent(catalogRepository::delete);
-//        catalogRepository.deleteById(id);
     }
 
     @Override
