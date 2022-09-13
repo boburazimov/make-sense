@@ -29,17 +29,17 @@ public class Annotation implements Serializable {
     @Column(name = "area")
     private Double area;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private Bbox bbox;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Project project;
 
     @ManyToOne
     private Image image;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Category category;
 
     public Annotation() {

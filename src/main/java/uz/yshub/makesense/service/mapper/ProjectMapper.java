@@ -2,6 +2,8 @@ package uz.yshub.makesense.service.mapper;
 
 import org.springframework.stereotype.Service;
 import uz.yshub.makesense.domain.Project;
+import uz.yshub.makesense.domain.enumeration.ProjectTypeEnum;
+import uz.yshub.makesense.service.dto.MainProjectDTO;
 import uz.yshub.makesense.service.dto.ProjectDTO;
 
 /**
@@ -41,5 +43,9 @@ public class ProjectMapper {
         if (dto.getType() != null) {
             entity.setType(dto.getType());
         }
+    }
+
+    public ProjectDTO toDtoFromMainDto(MainProjectDTO info, ProjectTypeEnum typeEnum) {
+        return info != null ? new ProjectDTO(info, typeEnum) : null;
     }
 }

@@ -31,6 +31,10 @@ public class Segmentation implements Serializable {
     @JsonIgnoreProperties(value = { "bbox", "project", "image", "category" }, allowSetters = true)
     private Annotation annotation;
 
+    public Segmentation() {
+
+    }
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {

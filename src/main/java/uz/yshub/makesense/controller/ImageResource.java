@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.config.MinioConfig;
 import uz.yshub.makesense.controller.errors.BadRequestAlertException;
-import uz.yshub.makesense.repository.ImageRepository;
 import uz.yshub.makesense.service.ImageService;
 import uz.yshub.makesense.service.dto.ApiResponseDTO;
 import uz.yshub.makesense.service.dto.ImageDTO;

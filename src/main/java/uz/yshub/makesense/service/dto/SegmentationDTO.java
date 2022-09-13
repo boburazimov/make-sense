@@ -46,6 +46,11 @@ public class SegmentationDTO implements Serializable {
         this.annotation = annotationDTO;
     }
 
+    public SegmentationDTO(Double coordinate, AnnotationDTO annotationDTO){
+        this.coordinate = coordinate;
+        this.annotation = annotationDTO;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

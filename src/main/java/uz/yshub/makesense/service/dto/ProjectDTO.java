@@ -49,6 +49,11 @@ public class ProjectDTO implements Serializable {
         this.type = project.getType();
     }
 
+    public ProjectDTO(MainProjectDTO info, ProjectTypeEnum type) {
+        this.description = info.getDescription();
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

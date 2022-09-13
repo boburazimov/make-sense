@@ -20,6 +20,10 @@ public class BboxDTO implements Serializable {
 
     private Double bboxHeght;
 
+    public BboxDTO() {
+
+    }
+
     public Long getId() {
         return id;
     }

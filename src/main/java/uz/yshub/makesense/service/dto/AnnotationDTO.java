@@ -24,6 +24,10 @@ public class AnnotationDTO implements Serializable {
 
     private CategoryDTO category;
 
+    public AnnotationDTO() {
+
+    }
+
     public Long getId() {
         return id;
     }

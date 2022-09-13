@@ -28,6 +28,12 @@ public class Category implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "description", length = 100)
+    private String description;
+
+    @Column(name = "color_code", length = 7)
+    private String colorCode;
+
     public Category() {
 
     }
@@ -60,36 +66,26 @@ public class Category implements Serializable {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getColorCode() {
+        return colorCode;
+    }
+
+    public void setColorCode(String colorCode) {
+        this.colorCode = colorCode;
+    }
+
     public Category(CategoryDTO categoryDTO) {
         this.id = categoryDTO.getId();
         this.name = categoryDTO.getName();
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Category)) {
-            return false;
-        }
-        return id != null && id.equals(((Category) o).id);
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "Category{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            "}";
+        this.description = categoryDTO.getDescription();
+        this.colorCode = categoryDTO.getColorCode();
     }
 }
