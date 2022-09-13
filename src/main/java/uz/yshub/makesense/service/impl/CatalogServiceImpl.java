@@ -38,7 +38,6 @@ public class CatalogServiceImpl implements CatalogService {
         Catalog catalog = new Catalog();
         catalog.setName(catalogDTO.getName());
         if (catalogDTO.getParentId() != null && catalogRepository.existsById(catalogDTO.getParentId())) {
-            // TODO: check catalog name to unique by in parent catalog.
             catalogRepository.findById(catalogDTO.getParentId()).ifPresent(catalog::setParent);
         }
         return catalogRepository.save(catalog);

@@ -16,8 +16,10 @@ import uz.yshub.makesense.repository.CatalogRepository;
 import uz.yshub.makesense.service.CatalogService;
 import uz.yshub.makesense.service.dto.CatalogDTO;
 
-import javax.validation.constraints.Null;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * REST controller for managing {@link uz.yshub.makesense.domain.Catalog}.
@@ -41,7 +43,6 @@ public class CatalogResource {
      * @param catalog the catalog to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new catalog,
      * or with status {@code 400 (Bad Request)} if the catalog has already an ID.
-     * // TODO: Fix createCatalog method with non null exist Parent catalog.
      */
     @PostMapping
     public ResponseEntity<Catalog> createCatalog(@RequestBody CatalogDTO catalog) {
@@ -50,6 +51,20 @@ public class CatalogResource {
         if (catalog.getId() != null) {
             throw new BadRequestAlertException("A new catalog cannot already have an ID", ENTITY_NAME, "idExists");
         }
+
+        if (catalog.getParentId() != null && !catalogRepository.existsById(catalog.getParentId())) {
+            throw new BadRequestAlertException("A new catalog parent ID: '" + catalog.getParentId() + "' cannot be found!", ENTITY_NAME, "idNotFound");
+        }
+
+        Boolean existsCatalog = (catalog.getParentId() != null)
+                ? catalogRepository.existsByNameAndParentId(catalog.getName(), catalog.getParentId())
+                : catalogRepository.existsByNameAndParentIsNull(catalog.getName());
+
+        if (existsCatalog) {
+            throw new BadRequestAlertException("A new catalog name '" + catalog.getName() + "' already created under the parent ID: " + catalog.getParentId(), ENTITY_NAME, "sameNameExists");
+        }
+
+
         Catalog result = catalogService.save(catalog);
         return ResponseEntity.ok().header(ENTITY_NAME, result.getName(), result.getId().toString()).body(result);
     }
@@ -115,6 +130,7 @@ public class CatalogResource {
      *
      * @param id the id of the catalog to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * TODO: Fix delete endpoint.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCatalog(@PathVariable Long id) {
