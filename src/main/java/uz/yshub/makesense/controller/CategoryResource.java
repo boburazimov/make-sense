@@ -1,18 +1,16 @@
 package uz.yshub.makesense.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//import tech.jhipster.web.util.HeaderUtil;
-//import tech.jhipster.web.util.ResponseUtil;
 import uz.yshub.makesense.controller.errors.BadRequestAlertException;
 import uz.yshub.makesense.controller.utils.ResponseUtil;
 import uz.yshub.makesense.repository.CategoryRepository;
 import uz.yshub.makesense.service.CategoryService;
 import uz.yshub.makesense.service.dto.CategoryDTO;
-
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -28,6 +26,8 @@ import java.util.Optional;
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Category", description = "The Catalog as Label API. Contains all the operations that can be performed on a category/label.")
 public class CategoryResource {
 
     private final Logger log = LoggerFactory.getLogger(CategoryResource.class);
