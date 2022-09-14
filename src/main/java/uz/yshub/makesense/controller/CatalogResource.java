@@ -14,8 +14,11 @@ import uz.yshub.makesense.controller.utils.ResponseUtil;
 import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.repository.CatalogRepository;
 import uz.yshub.makesense.service.CatalogService;
+import uz.yshub.makesense.service.dto.ApiResponse;
 import uz.yshub.makesense.service.dto.CatalogDTO;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,19 +54,6 @@ public class CatalogResource {
         if (catalog.getId() != null) {
             throw new BadRequestAlertException("A new catalog cannot already have an ID", ENTITY_NAME, "idExists");
         }
-
-        if (catalog.getParentId() != null && !catalogRepository.existsById(catalog.getParentId())) {
-            throw new BadRequestAlertException("A new catalog parent ID: '" + catalog.getParentId() + "' cannot be found!", ENTITY_NAME, "idNotFound");
-        }
-
-        Boolean existsCatalog = (catalog.getParentId() != null)
-                ? catalogRepository.existsByNameAndParentId(catalog.getName(), catalog.getParentId())
-                : catalogRepository.existsByNameAndParentIsNull(catalog.getName());
-
-        if (existsCatalog) {
-            throw new BadRequestAlertException("A new catalog name '" + catalog.getName() + "' already created under the parent ID: " + catalog.getParentId(), ENTITY_NAME, "sameNameExists");
-        }
-
 
         Catalog result = catalogService.save(catalog);
         return ResponseEntity.ok().header(ENTITY_NAME, result.getName(), result.getId().toString()).body(result);
@@ -137,5 +127,22 @@ public class CatalogResource {
         log.debug("REST request to delete Catalog : {}", id);
         catalogService.delete(id);
         return ResponseEntity.noContent().header(ENTITY_NAME, id.toString()).build();
+    }
+
+    /**
+     * Upload files from directory
+     * @return
+     * @throws IOException
+     */
+    @GetMapping(value = "/upload")
+    public ResponseEntity<?>uploadImages() throws IOException {
+        log.debug("Request to upload files from directory");
+        final String uploadFolderName = "uploads";
+        File file = new File(uploadFolderName);
+        int fileLength = file.listFiles().length;
+        if(fileLength > 0) {
+            catalogService.loadImages(uploadFolderName, null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true,"files upload successfully"));
     }
 }
