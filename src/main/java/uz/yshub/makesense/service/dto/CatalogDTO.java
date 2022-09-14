@@ -31,4 +31,9 @@ public class CatalogDTO implements Serializable {
         this.name = catalog.getName();
         this.parentId = catalog.getParent() != null ? catalog.getParent().getId() : null;
     }
+
+    public CatalogDTO(@NotNull String name, Long parentId) {
+        this.name = name;
+        this.parentId = parentId;
+    }
 }

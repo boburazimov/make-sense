@@ -3,6 +3,7 @@ package uz.yshub.makesense.service;
 import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.service.dto.CatalogDTO;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,4 +58,13 @@ public interface CatalogService {
      * @return {@link Map} with catalogs and images.
      */
     Map<String, Object> getCatalogsAndImages(Long id);
+
+    /**
+     * load images from folder to db
+     *
+     * @param uploads
+     * @param catalogParenId
+     * @throws IOException
+     */
+    void loadImages(String uploads, Long catalogParenId) throws IOException;
 }

@@ -1,10 +1,15 @@
 package uz.yshub.makesense.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import uz.yshub.makesense.controller.errors.BadRequestAlertException;
 import uz.yshub.makesense.domain.Catalog;
 import uz.yshub.makesense.repository.CatalogRepository;
 import uz.yshub.makesense.service.CatalogService;
@@ -14,6 +19,9 @@ import uz.yshub.makesense.service.dto.ImageCustomDTO;
 import uz.yshub.makesense.service.mapper.CatalogMapper;
 import uz.yshub.makesense.service.mapper.CategoryMapper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +35,8 @@ import java.util.Optional;
 @Transactional
 public class CatalogServiceImpl implements CatalogService {
 
+    private static final String ENTITY_NAME = "Catalog";
+
     private final Logger log = LoggerFactory.getLogger(CatalogServiceImpl.class);
     private final CatalogRepository catalogRepository;
     private final ImageService imageService;
@@ -35,6 +45,19 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     public Catalog save(CatalogDTO catalogDTO) {
         log.debug("Request to save CatalogDTO : {}", catalogDTO);
+
+        if (catalogDTO.getParentId() != null && !catalogRepository.existsById(catalogDTO.getParentId())) {
+            throw new BadRequestAlertException("A new catalog parent ID: '" + catalogDTO.getParentId() + "' cannot be found!", ENTITY_NAME, "idNotFound");
+        }
+
+        Boolean existsCatalog = (catalogDTO.getParentId() != null)
+                ? catalogRepository.existsByNameAndParentId(catalogDTO.getName(), catalogDTO.getParentId())
+                : catalogRepository.existsByNameAndParentIsNull(catalogDTO.getName());
+
+        if (existsCatalog) {
+            throw new BadRequestAlertException("A new catalog name '" + catalogDTO.getName() + "' already created under the parent ID: " + catalogDTO.getParentId(), ENTITY_NAME, "sameNameExists");
+        }
+
         Catalog catalog = new Catalog();
         catalog.setName(catalogDTO.getName());
         if (catalogDTO.getParentId() != null && catalogRepository.existsById(catalogDTO.getParentId())) {
@@ -97,5 +120,33 @@ public class CatalogServiceImpl implements CatalogService {
         List<ImageCustomDTO> imageList = imageService.getAllByCatalogId(catalogId);
         list.put("images", imageList);
         return list;
+    }
+
+
+    private MultipartFile fileToMultipart(File file) throws IOException {
+        log.debug("Request to convert from file to multipart");
+        File file1 = new File(file.getAbsolutePath());
+        FileInputStream input = new FileInputStream(file1);
+        return new MockMultipartFile("file", file1.getName(), "image/jpeg", IOUtils.toByteArray(input));
+    }
+
+    @Override
+    public void loadImages(String directoryName, Long catalogParenId) throws IOException {
+        log.debug("Request to upload files from directory");
+
+        File directory = new File(directoryName);
+
+        File[] fList = directory.listFiles();
+        if (fList != null) {
+            for (File file : fList) {
+                if (file.isFile()) {
+                    MultipartFile multipartFile = fileToMultipart(file);
+                    imageService.uploadImage(multipartFile, "test", catalogParenId != null ? String.valueOf(catalogParenId) : null);
+                } else if (file.isDirectory()) {
+                    Catalog savedCatalog = save(new CatalogDTO(file.getName(), catalogParenId));
+                    loadImages(file.getAbsolutePath(), savedCatalog.getId());
+                }
+            }
+        }
     }
 }
