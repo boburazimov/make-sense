@@ -7,7 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.domain.Image;
 import uz.yshub.makesense.repository.CatalogRepository;
@@ -92,6 +95,13 @@ public class ImageServiceImpl implements ImageService {
             imageCustomDTOList.add(imgDto);
         }));
         return imageCustomDTOList;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ImageDTO> findAll(Pageable pageable) {
+        log.debug("Request to get all Images");
+        return imageRepository.findAll(pageable).map(imageMapper::toDto);
     }
 
     private Image createAttachment(MultipartFile multipartFile, String catalogId, String bucketName) {

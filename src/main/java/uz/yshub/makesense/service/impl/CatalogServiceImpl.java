@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import uz.yshub.makesense.service.ImageService;
 import uz.yshub.makesense.service.dto.CatalogDTO;
 import uz.yshub.makesense.service.dto.ImageCustomDTO;
 import uz.yshub.makesense.service.mapper.CatalogMapper;
-import uz.yshub.makesense.service.mapper.CategoryMapper;
 
 import java.io.File;
 import java.io.FileInputStream;

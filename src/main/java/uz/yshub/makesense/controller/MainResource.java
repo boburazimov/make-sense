@@ -70,7 +70,7 @@ public class MainResource {
             }
         }
 
-        apiResponse = mainService.savePoint(mainDTO, type);
+        apiResponse = mainService.save(mainDTO, type);
 
         return ResponseEntity.status(apiResponse.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST)
                 .body(apiResponse);

@@ -7,14 +7,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uz.yshub.makesense.config.MinioConfig;
 import uz.yshub.makesense.controller.errors.BadRequestAlertException;
+import uz.yshub.makesense.controller.utils.PaginationUtil;
 import uz.yshub.makesense.service.ImageService;
 import uz.yshub.makesense.service.dto.ApiResponseDTO;
 import uz.yshub.makesense.service.dto.ImageDTO;
@@ -67,17 +71,16 @@ public class ImageResource {
 
     /**
      * {@code GET  /images} : get all the images.
-     * TODO: Fix this endpoint
+     *
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of images in body.
      */
     @GetMapping("/images")
     public ResponseEntity<List<ImageDTO>> getAllImages(@ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Images");
-//        Page<ImageDTO> page = imageService.findAll(pageable);
-//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-//        return ResponseEntity.ok().headers(headers).body(page.getContent());
-        return null;
+        Page<ImageDTO> page = imageService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**

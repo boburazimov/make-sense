@@ -39,7 +39,7 @@ public class MainServiceImpl implements MainService {
     private final ProjectMapper projectMapper;
 
     @Override
-    public ApiResponse savePoint(MainDTO mainDTO, ProjectTypeEnum projectTypeEnum) {
+    public ApiResponse save(MainDTO mainDTO, ProjectTypeEnum projectTypeEnum) {
         log.debug("Request to create new Project by annotations: {}", mainDTO);
 
         final ProjectDTO projectDTO = (mainDTO.getInfo() != null && mainDTO.getInfo().getDescription() != null)

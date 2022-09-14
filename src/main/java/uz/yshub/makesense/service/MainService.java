@@ -11,10 +11,10 @@ public interface MainService {
 
     /**
      * Create all Entities by the loop.
-     * TODO: Rename method from savePoint to save.
+     *
      * @param mainDTO the entity to save.
      * @return the persisted entity.
      */
-    ApiResponse savePoint(MainDTO mainDTO, ProjectTypeEnum type);
+    ApiResponse save(MainDTO mainDTO, ProjectTypeEnum type);
 
 }

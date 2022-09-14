@@ -1,5 +1,7 @@
 package uz.yshub.makesense.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.service.dto.ImageCustomDTO;
 import uz.yshub.makesense.service.dto.ImageDTO;
@@ -35,4 +37,12 @@ public interface ImageService {
      * @return List of ImageCustomDTO.
      */
     List<ImageCustomDTO> getAllByCatalogId(Long catalogId);
+
+    /**
+     * Get all the images.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    Page<ImageDTO> findAll(Pageable pageable);
 }
