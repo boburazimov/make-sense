@@ -54,7 +54,7 @@ public class MainServiceImpl implements MainService {
 
                 AnnotationDTO annotationDTO = new AnnotationDTO();
                 annotationDTO.setArea(mainAnnotationDTO.getArea());
-                annotationDTO.setIscrowd(mainAnnotationDTO.getIscrowd());
+                annotationDTO.setIscrowd(mainAnnotationDTO.getIscrowd() > 0);
                 annotationDTO.setProject(projectDTO);
 
                 if (mainAnnotationDTO.getBbox() != null) {

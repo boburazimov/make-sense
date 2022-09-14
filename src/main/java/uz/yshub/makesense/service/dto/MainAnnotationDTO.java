@@ -23,7 +23,7 @@ public class MainAnnotationDTO {
 
     private Long id;
 
-    private Boolean iscrowd;
+    private int iscrowd;
 
     private Long image_id;
 
