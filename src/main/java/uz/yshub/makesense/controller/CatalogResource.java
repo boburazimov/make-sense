@@ -19,6 +19,8 @@ import uz.yshub.makesense.service.dto.CatalogDTO;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +41,7 @@ public class CatalogResource {
     private static final String ENTITY_NAME = "Catalog";
     private final CatalogService catalogService;
     private final CatalogRepository catalogRepository;
+    private final Path root = Paths.get("uploads");
 
     /**
      * {@code POST  /catalogs} : Create a new catalog.
@@ -137,11 +140,14 @@ public class CatalogResource {
     @GetMapping(value = "/upload")
     public ResponseEntity<?>uploadImages() throws IOException {
         log.debug("Request to upload files from directory");
-        final String uploadFolderName = "uploads";
-        File file = new File(uploadFolderName);
+        File file = new File(root.toString());
+        // Check for exist the static folder.
+        if(!file.exists()) {
+            file.mkdir();
+        }
         int fileLength = file.listFiles().length;
         if(fileLength > 0) {
-            catalogService.loadImages(uploadFolderName, null);
+            catalogService.loadImages(root.toString(), null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true,"files upload successfully"));
     }
