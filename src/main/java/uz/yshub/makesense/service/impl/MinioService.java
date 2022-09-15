@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.controller.utils.ImageUtils;
@@ -32,11 +31,6 @@ public class MinioService {
     private final Logger log = LoggerFactory.getLogger(MinioService.class);
     private final MinioClient minioClient;
 
-    @Value("${minio.image.resize.width}")
-    private int width;
-    @Value("${minio.image.resize.height}")
-    private int height;
-
     @SneakyThrows
     public void uploadFile(MultipartFile multipartFile, Image image, String bucket) {
         log.debug("Request to upload one file in by MinioClient");
@@ -46,7 +40,6 @@ public class MinioService {
             // Make a new bucket.
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
-
 
         String bucketPolicy = minioClient.getBucketPolicy(GetBucketPolicyArgs.builder().bucket(bucket).build());
         System.out.println(bucketPolicy);
@@ -88,7 +81,7 @@ public class MinioService {
         image.setHeight(bufferedImage.getHeight());
 
         // Resize image and return new resizedImage.
-        return ImageUtils.resizeImage(bufferedImage, width, height);
+        return ImageUtils.resizeImage(bufferedImage);
     }
 
     /**
