@@ -1,7 +1,6 @@
 package uz.yshub.makesense.service.impl;
 
 import io.minio.*;
-import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -16,10 +15,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -145,9 +141,5 @@ public class MinioService {
                 .tags(headers)
                 .stream(multipartFile.getInputStream(), Long.parseLong(image.getFileSize()), -1);
         return builder;
-    }
-
-    public void abc() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        minioClient.downloadObject(DownloadObjectArgs.builder().build());
     }
 }

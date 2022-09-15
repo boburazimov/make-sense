@@ -1,7 +1,5 @@
 package uz.yshub.makesense.controller.utils;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,9 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ImageUtils {
-
-    @Value("${minio.image.resize.width}")
-    private static int BOUNDARY_SIZE;
 
     // convert BufferedImage to byte[]
     public static byte[] toByteArray(BufferedImage bi, String format) throws IOException {
@@ -36,8 +31,8 @@ public class ImageUtils {
         int original_width = originalImage.getWidth();
         int original_height = originalImage.getHeight();
 
-        int bound_width = BOUNDARY_SIZE;
-        int bound_height = BOUNDARY_SIZE;
+        int bound_width = 200;
+        int bound_height = 200;
 
         int new_width = original_width;
         int new_height = original_height;

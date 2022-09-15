@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Data
-//@Component
 @Configuration
-//@ConfigurationProperties(prefix = "minio")
 public class MinioConfig {
 
     /**

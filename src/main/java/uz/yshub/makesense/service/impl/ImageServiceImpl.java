@@ -62,15 +62,11 @@ public class ImageServiceImpl implements ImageService {
     public ImageDTO uploadImage(MultipartFile multipartFile, String bucket, String catalogId) {
         log.debug("Request to upload one file to uploadImage method");
 
-//        if (multipartFile.getSize() > (long) 50 * 1000) {
-            Image image = createAttachment(multipartFile, catalogId, bucket);
-            minioService.uploadFile(multipartFile, image, bucket);
-            Image savedImage = imageRepository.save(image);
-            log.debug("Response to upload one file to uploadImage method");
-            return imageMapper.toDto(savedImage);
-//        } else {
-//            throw new IllegalArgumentException("Size of upload image is upper max-limit. Image: " + multipartFile.getOriginalFilename());
-//        }
+        Image image = createAttachment(multipartFile, catalogId, bucket);
+        minioService.uploadFile(multipartFile, image, bucket);
+        Image savedImage = imageRepository.save(image);
+        log.debug("Response to upload one file to uploadImage method");
+        return imageMapper.toDto(savedImage);
     }
 
     @Override
