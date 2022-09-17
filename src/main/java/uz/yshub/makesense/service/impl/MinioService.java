@@ -1,10 +1,15 @@
 package uz.yshub.makesense.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
+import com.cloudinary.utils.ObjectUtils;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.yshub.makesense.controller.utils.ImageUtils;
@@ -12,10 +17,9 @@ import uz.yshub.makesense.domain.Image;
 import uz.yshub.makesense.service.dto.FileModel;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +30,9 @@ public class MinioService {
 
     private final Logger log = LoggerFactory.getLogger(MinioService.class);
     private final MinioClient minioClient;
+
+    @Value("${minio.endpoint}")
+    private String BaseUrl;
 
     @SneakyThrows
     public void uploadFile(MultipartFile multipartFile, Image image, String bucket) {
@@ -47,6 +54,8 @@ public class MinioService {
         // Upload 'fileName' as object name 'fileNameAndExtension' to bucket.
         finalUploadImage(putObjectArgs, image.getFileName(), bucket);
 
+//        String s = cloudinaryService(image);
+
         BufferedImage thumbnailBufferedImage = makeThumbnailImageFromStoredImage(bucket, image);
 
         // Make builder for put resized Object into Minio.
@@ -62,15 +71,47 @@ public class MinioService {
         log.debug("Image success saved: " + fileName + ". To bucket: " + bucket);
     }
 
-    @SneakyThrows
-    private BufferedImage makeThumbnailImageFromStoredImage(String bucket, Image image) {
+    private String cloudinaryService(Image image){
+
+        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", "dtr8fw41y",
+                "api_key", "988982831456151",
+                "api_secret", "OLgxvpcry6oqQoYKkYWI47Aybf0"));
+
+
+//        String minioFileUrl = BaseUrl + File.separator + image.getPath();
+        String minioFileUrl = "http://176.96.241.203:9000/makesense/0d947cba-74af-4cc5-ab00-4daa39e74af0.jpeg";
+
+        Map params = ObjectUtils.asMap(
+                "public_id", image.getThumbnailFileName(),
+                "overwrite", true
+        );
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(minioFileUrl, params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        cloudinary.url().transformation(new Transformation().height(200).width(200).crop("limit")).imageTag("recipes/cashew_chicken.jpg");
+        String thumbUrl = cloudinary.url()
+                .transformation(new Transformation().width(200).crop("thumb"))
+                .publicId(image.getThumbnailFileName()).generate(image.getThumbnailFileName());
+
+        return null;
+    }
+
+
+    private BufferedImage makeThumbnailImageFromStoredImage(String bucket, Image image) throws IOException {
         log.debug("Request to makeThumbnailImageFromStoredImage method MinioClient");
 
         // Get object from minio.
         InputStream savedImageInputStream = getObjectByBucketNameAndFileName(bucket, image.getFileName());
 
+        ImageInputStream imageInputStream = ImageIO.createImageInputStream(savedImageInputStream);
+
         // Create BufferedImage
-        BufferedImage bufferedImage = ImageIO.read(savedImageInputStream);
+        BufferedImage bufferedImage = ImageIO.read(imageInputStream);
 
         // Fill last two field of Image.
         image.setWidth(bufferedImage.getWidth());
